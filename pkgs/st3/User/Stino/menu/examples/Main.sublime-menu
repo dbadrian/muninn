@@ -1,0 +1,603 @@
+[
+	{
+		"caption": "Arduino",
+		"mnemonic": "A",
+		"id": "arduino",
+		"children":
+		[
+			{
+				"caption": "Open Example",
+				"id": "stino_examples",
+				"children":
+				[
+					{
+						"caption": "Refresh",
+						"id": "stino_refresh_examples",
+						"command": "stino_refresh_examples"
+					},
+					{"caption": "-"},
+					{
+						"caption": "05.Control",
+						"id": "stino_example_05.Control",
+						"children":
+						[
+							{"caption": "-"},
+							{
+								"caption": "IfStatementConditional",
+								"id": "stino_example_IfStatementConditional",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/05.Control/IfStatementConditional"}
+							},
+							{
+								"caption": "ForLoopIteration",
+								"id": "stino_example_ForLoopIteration",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/05.Control/ForLoopIteration"}
+							},
+							{
+								"caption": "Arrays",
+								"id": "stino_example_Arrays",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/05.Control/Arrays"}
+							},
+							{
+								"caption": "switchCase2",
+								"id": "stino_example_switchCase2",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/05.Control/switchCase2"}
+							},
+							{
+								"caption": "switchCase",
+								"id": "stino_example_switchCase",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/05.Control/switchCase"}
+							},
+							{
+								"caption": "WhileStatementConditional",
+								"id": "stino_example_WhileStatementConditional",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/05.Control/WhileStatementConditional"}
+							}						]
+					},
+					{
+						"caption": "11.ArduinoISP",
+						"id": "stino_example_11.ArduinoISP",
+						"children":
+						[
+							{"caption": "-"},
+							{
+								"caption": "ArduinoISP",
+								"id": "stino_example_ArduinoISP",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/11.ArduinoISP/ArduinoISP"}
+							}						]
+					},
+					{
+						"caption": "01.Basics",
+						"id": "stino_example_01.Basics",
+						"children":
+						[
+							{"caption": "-"},
+							{
+								"caption": "Fade",
+								"id": "stino_example_Fade",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/01.Basics/Fade"}
+							},
+							{
+								"caption": "AnalogReadSerial",
+								"id": "stino_example_AnalogReadSerial",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/01.Basics/AnalogReadSerial"}
+							},
+							{
+								"caption": "DigitalReadSerial",
+								"id": "stino_example_DigitalReadSerial",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/01.Basics/DigitalReadSerial"}
+							},
+							{
+								"caption": "BareMinimum",
+								"id": "stino_example_BareMinimum",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/01.Basics/BareMinimum"}
+							},
+							{
+								"caption": "ReadAnalogVoltage",
+								"id": "stino_example_ReadAnalogVoltage",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/01.Basics/ReadAnalogVoltage"}
+							},
+							{
+								"caption": "Blink",
+								"id": "stino_example_Blink",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/01.Basics/Blink"}
+							}						]
+					},
+					{
+						"caption": "09.USB",
+						"id": "stino_example_09.USB",
+						"children":
+						[
+							{"caption": "-"},
+							{
+								"caption": "KeyboardAndMouseControl",
+								"id": "stino_example_KeyboardAndMouseControl",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/09.USB/KeyboardAndMouseControl"}
+							},
+							{
+								"caption": "Keyboard",
+								"id": "stino_example_Keyboard",
+								"children":
+								[
+									{"caption": "-"},
+									{
+										"caption": "KeyboardMessage",
+										"id": "stino_example_KeyboardMessage",
+										"command": "stino_open_example",
+										"args": {"example_path": "/usr/share/arduino/examples/09.USB/Keyboard/KeyboardMessage"}
+									},
+									{
+										"caption": "KeyboardSerial",
+										"id": "stino_example_KeyboardSerial",
+										"command": "stino_open_example",
+										"args": {"example_path": "/usr/share/arduino/examples/09.USB/Keyboard/KeyboardSerial"}
+									},
+									{
+										"caption": "KeyboardLogout",
+										"id": "stino_example_KeyboardLogout",
+										"command": "stino_open_example",
+										"args": {"example_path": "/usr/share/arduino/examples/09.USB/Keyboard/KeyboardLogout"}
+									},
+									{
+										"caption": "KeyboardReprogram",
+										"id": "stino_example_KeyboardReprogram",
+										"command": "stino_open_example",
+										"args": {"example_path": "/usr/share/arduino/examples/09.USB/Keyboard/KeyboardReprogram"}
+									}								]
+							},
+							{
+								"caption": "Mouse",
+								"id": "stino_example_Mouse",
+								"children":
+								[
+									{"caption": "-"},
+									{
+										"caption": "ButtonMouseControl",
+										"id": "stino_example_ButtonMouseControl",
+										"command": "stino_open_example",
+										"args": {"example_path": "/usr/share/arduino/examples/09.USB/Mouse/ButtonMouseControl"}
+									},
+									{
+										"caption": "JoystickMouseControl",
+										"id": "stino_example_JoystickMouseControl",
+										"command": "stino_open_example",
+										"args": {"example_path": "/usr/share/arduino/examples/09.USB/Mouse/JoystickMouseControl"}
+									}								]
+							}						]
+					},
+					{
+						"caption": "06.Sensors",
+						"id": "stino_example_06.Sensors",
+						"children":
+						[
+							{"caption": "-"},
+							{
+								"caption": "Memsic2125",
+								"id": "stino_example_Memsic2125",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/06.Sensors/Memsic2125"}
+							},
+							{
+								"caption": "ADXL3xx",
+								"id": "stino_example_ADXL3xx",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/06.Sensors/ADXL3xx"}
+							},
+							{
+								"caption": "Knock",
+								"id": "stino_example_Knock",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/06.Sensors/Knock"}
+							},
+							{
+								"caption": "Ping",
+								"id": "stino_example_Ping",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/06.Sensors/Ping"}
+							}						]
+					},
+					{
+						"caption": "04.Communication",
+						"id": "stino_example_04.Communication",
+						"children":
+						[
+							{"caption": "-"},
+							{
+								"caption": "SerialCallResponse",
+								"id": "stino_example_SerialCallResponse",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/04.Communication/SerialCallResponse"}
+							},
+							{
+								"caption": "Graph",
+								"id": "stino_example_Graph",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/04.Communication/Graph"}
+							},
+							{
+								"caption": "SerialCallResponseASCII",
+								"id": "stino_example_SerialCallResponseASCII",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/04.Communication/SerialCallResponseASCII"}
+							},
+							{
+								"caption": "VirtualColorMixer",
+								"id": "stino_example_VirtualColorMixer",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/04.Communication/VirtualColorMixer"}
+							},
+							{
+								"caption": "PhysicalPixel",
+								"id": "stino_example_PhysicalPixel",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/04.Communication/PhysicalPixel"}
+							},
+							{
+								"caption": "Dimmer",
+								"id": "stino_example_Dimmer",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/04.Communication/Dimmer"}
+							},
+							{
+								"caption": "MultiSerial",
+								"id": "stino_example_MultiSerial",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/04.Communication/MultiSerial"}
+							},
+							{
+								"caption": "SerialPassthrough",
+								"id": "stino_example_SerialPassthrough",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/04.Communication/SerialPassthrough"}
+							},
+							{
+								"caption": "Midi",
+								"id": "stino_example_Midi",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/04.Communication/Midi"}
+							},
+							{
+								"caption": "ASCIITable",
+								"id": "stino_example_ASCIITable",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/04.Communication/ASCIITable"}
+							},
+							{
+								"caption": "SerialEvent",
+								"id": "stino_example_SerialEvent",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/04.Communication/SerialEvent"}
+							},
+							{
+								"caption": "ReadASCIIString",
+								"id": "stino_example_ReadASCIIString",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/04.Communication/ReadASCIIString"}
+							}						]
+					},
+					{
+						"caption": "08.Strings",
+						"id": "stino_example_08.Strings",
+						"children":
+						[
+							{"caption": "-"},
+							{
+								"caption": "StringReplace",
+								"id": "stino_example_StringReplace",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/08.Strings/StringReplace"}
+							},
+							{
+								"caption": "StringLength",
+								"id": "stino_example_StringLength",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/08.Strings/StringLength"}
+							},
+							{
+								"caption": "StringCaseChanges",
+								"id": "stino_example_StringCaseChanges",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/08.Strings/StringCaseChanges"}
+							},
+							{
+								"caption": "StringComparisonOperators",
+								"id": "stino_example_StringComparisonOperators",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/08.Strings/StringComparisonOperators"}
+							},
+							{
+								"caption": "StringIndexOf",
+								"id": "stino_example_StringIndexOf",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/08.Strings/StringIndexOf"}
+							},
+							{
+								"caption": "StringConstructors",
+								"id": "stino_example_StringConstructors",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/08.Strings/StringConstructors"}
+							},
+							{
+								"caption": "StringLengthTrim",
+								"id": "stino_example_StringLengthTrim",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/08.Strings/StringLengthTrim"}
+							},
+							{
+								"caption": "StringSubstring",
+								"id": "stino_example_StringSubstring",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/08.Strings/StringSubstring"}
+							},
+							{
+								"caption": "StringToInt",
+								"id": "stino_example_StringToInt",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/08.Strings/StringToInt"}
+							},
+							{
+								"caption": "StringCharacters",
+								"id": "stino_example_StringCharacters",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/08.Strings/StringCharacters"}
+							},
+							{
+								"caption": "CharacterAnalysis",
+								"id": "stino_example_CharacterAnalysis",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/08.Strings/CharacterAnalysis"}
+							},
+							{
+								"caption": "StringAppendOperator",
+								"id": "stino_example_StringAppendOperator",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/08.Strings/StringAppendOperator"}
+							},
+							{
+								"caption": "StringStartsWithEndsWith",
+								"id": "stino_example_StringStartsWithEndsWith",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/08.Strings/StringStartsWithEndsWith"}
+							},
+							{
+								"caption": "StringAdditionOperator",
+								"id": "stino_example_StringAdditionOperator",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/08.Strings/StringAdditionOperator"}
+							}						]
+					},
+					{
+						"caption": "07.Display",
+						"id": "stino_example_07.Display",
+						"children":
+						[
+							{"caption": "-"},
+							{
+								"caption": "barGraph",
+								"id": "stino_example_barGraph",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/07.Display/barGraph"}
+							},
+							{
+								"caption": "RowColumnScanning",
+								"id": "stino_example_RowColumnScanning",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/07.Display/RowColumnScanning"}
+							}						]
+					},
+					{
+						"caption": "03.Analog",
+						"id": "stino_example_03.Analog",
+						"children":
+						[
+							{"caption": "-"},
+							{
+								"caption": "Calibration",
+								"id": "stino_example_Calibration",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/03.Analog/Calibration"}
+							},
+							{
+								"caption": "AnalogWriteMega",
+								"id": "stino_example_AnalogWriteMega",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/03.Analog/AnalogWriteMega"}
+							},
+							{
+								"caption": "AnalogInOutSerial",
+								"id": "stino_example_AnalogInOutSerial",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/03.Analog/AnalogInOutSerial"}
+							},
+							{
+								"caption": "Smoothing",
+								"id": "stino_example_Smoothing",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/03.Analog/Smoothing"}
+							},
+							{
+								"caption": "Fading",
+								"id": "stino_example_Fading",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/03.Analog/Fading"}
+							},
+							{
+								"caption": "AnalogInput",
+								"id": "stino_example_AnalogInput",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/03.Analog/AnalogInput"}
+							}						]
+					},
+					{
+						"caption": "02.Digital",
+						"id": "stino_example_02.Digital",
+						"children":
+						[
+							{"caption": "-"},
+							{
+								"caption": "toneKeyboard",
+								"id": "stino_example_toneKeyboard",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/02.Digital/toneKeyboard"}
+							},
+							{
+								"caption": "toneMelody",
+								"id": "stino_example_toneMelody",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/02.Digital/toneMelody"}
+							},
+							{
+								"caption": "DigitalInputPullup",
+								"id": "stino_example_DigitalInputPullup",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/02.Digital/DigitalInputPullup"}
+							},
+							{
+								"caption": "toneMultiple",
+								"id": "stino_example_toneMultiple",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/02.Digital/toneMultiple"}
+							},
+							{
+								"caption": "StateChangeDetection",
+								"id": "stino_example_StateChangeDetection",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/02.Digital/StateChangeDetection"}
+							},
+							{
+								"caption": "Button",
+								"id": "stino_example_Button",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/02.Digital/Button"}
+							},
+							{
+								"caption": "BlinkWithoutDelay",
+								"id": "stino_example_BlinkWithoutDelay",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/02.Digital/BlinkWithoutDelay"}
+							},
+							{
+								"caption": "Debounce",
+								"id": "stino_example_Debounce",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/02.Digital/Debounce"}
+							},
+							{
+								"caption": "tonePitchFollower",
+								"id": "stino_example_tonePitchFollower",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/02.Digital/tonePitchFollower"}
+							}						]
+					},
+					{
+						"caption": "10.StarterKit_BasicKit",
+						"id": "stino_example_10.StarterKit_BasicKit",
+						"children":
+						[
+							{"caption": "-"},
+							{
+								"caption": "p03_LoveOMeter",
+								"id": "stino_example_p03_LoveOMeter",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/10.StarterKit_BasicKit/p03_LoveOMeter"}
+							},
+							{
+								"caption": "p13_TouchSensorLamp",
+								"id": "stino_example_p13_TouchSensorLamp",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/10.StarterKit_BasicKit/p13_TouchSensorLamp"}
+							},
+							{
+								"caption": "p10_Zoetrope",
+								"id": "stino_example_p10_Zoetrope",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/10.StarterKit_BasicKit/p10_Zoetrope"}
+							},
+							{
+								"caption": "p11_CrystalBall",
+								"id": "stino_example_p11_CrystalBall",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/10.StarterKit_BasicKit/p11_CrystalBall"}
+							},
+							{
+								"caption": "p05_ServoMoodIndicator",
+								"id": "stino_example_p05_ServoMoodIndicator",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/10.StarterKit_BasicKit/p05_ServoMoodIndicator"}
+							},
+							{
+								"caption": "p04_ColorMixingLamp",
+								"id": "stino_example_p04_ColorMixingLamp",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/10.StarterKit_BasicKit/p04_ColorMixingLamp"}
+							},
+							{
+								"caption": "p14_TweakTheArduinoLogo",
+								"id": "stino_example_p14_TweakTheArduinoLogo",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/10.StarterKit_BasicKit/p14_TweakTheArduinoLogo"}
+							},
+							{
+								"caption": "p15_HackingButtons",
+								"id": "stino_example_p15_HackingButtons",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/10.StarterKit_BasicKit/p15_HackingButtons"}
+							},
+							{
+								"caption": "p06_LightTheremin",
+								"id": "stino_example_p06_LightTheremin",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/10.StarterKit_BasicKit/p06_LightTheremin"}
+							},
+							{
+								"caption": "p09_MotorizedPinwheel",
+								"id": "stino_example_p09_MotorizedPinwheel",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/10.StarterKit_BasicKit/p09_MotorizedPinwheel"}
+							},
+							{
+								"caption": "p02_SpaceshipInterface",
+								"id": "stino_example_p02_SpaceshipInterface",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/10.StarterKit_BasicKit/p02_SpaceshipInterface"}
+							},
+							{
+								"caption": "p12_KnockLock",
+								"id": "stino_example_p12_KnockLock",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/10.StarterKit_BasicKit/p12_KnockLock"}
+							},
+							{
+								"caption": "p08_DigitalHourglass",
+								"id": "stino_example_p08_DigitalHourglass",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/10.StarterKit_BasicKit/p08_DigitalHourglass"}
+							},
+							{
+								"caption": "p07_Keyboard",
+								"id": "stino_example_p07_Keyboard",
+								"command": "stino_open_example",
+								"args": {"example_path": "/usr/share/arduino/examples/10.StarterKit_BasicKit/p07_Keyboard"}
+							}						]
+					},
+					{"caption": "-"},
+					{"caption": "-"},
+					{"caption": "-"}
+				]
+			}
+		]
+	}
+]
