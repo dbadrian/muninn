@@ -1,6 +1,13 @@
-# folders
-data/
-_muninn_bak/
+#### MUNINN FOLDERS
+pkgs/*
+!pkgs/.gitignore
+# Data With Confidential information
+config.json
+
+# Folders
+legacy/
+_bak/
+_muninn_bak
 
 *.orig
 # Byte-compiled / optimized / DLL files
@@ -102,3 +109,7 @@ ENV/
 
 # mypy
 .mypy_cache/ 
+
+*.do
+*.do.cfg
+*.do.state
