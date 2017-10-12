@@ -13,8 +13,9 @@ alias mst='make 2>&1 | colout -t cmake | colout -t g++'
 alias mstt='make 2>&1 | colout -t cmake | colout -t gtest'
 alias mmt='make -j9 2>&1 | colout -t cmake | colout -t g++ gtest'
 
-# Arch
+# Arch / System
 alias update='pacaur -Syu'
+alias pubkey="more ~/.ssh/id_rsa.pub | xclip | echo '=> Public key copied to pasteboard.'"
 
 # Git
 alias cdgit='cd ~/git'
