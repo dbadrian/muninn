@@ -1,0 +1,49 @@
+import logging
+logger = logging.getLogger(__name__)
+
+pkg = {
+    "name": "example",
+    "desc": "Example Config Installer",
+    "ver": 0.1,
+    "depends": {
+        "arch": [
+        ],
+        "muninn": [
+        ]
+    },
+    "conflicts": [],
+
+    "install_path": "~/",
+    "targets": [
+    ]
+}
+
+
+def backup(pkg_dir, target_dir, backup_folder):
+    """
+    If anything needs to be done additionally to backupping the
+    files/folders defined in backup
+    """
+    pass
+
+
+def install(pkg_dir, target_dir):
+    """
+    If anything needs to be installed/configured before placing symlinks
+    on targets, use this function.
+    """
+    pass
+
+def post_install(pkg_dir, target_dir):
+    """
+    If anything needs to done after placing symlinks
+    on targets, use this function.
+    """
+    pass
+
+def clean(pkg_dir, target_dir):
+    """
+    If anything needs to be done manually if something failes,
+    please specfiy here.
+    """
+    pass

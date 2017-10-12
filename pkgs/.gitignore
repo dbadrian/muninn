@@ -1,0 +1,7 @@
+# Add all config folders which are ready to be synced explicitly here for now...
+#!zsh/
+#!st3/
+#!system_setup/
+#!terminator/
+#!user_bin/
+#!example/

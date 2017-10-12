@@ -1,0 +1,53 @@
+# Muninn
+alias cdmuninn='cd ~/git/muninn'
+alias muninn_backup='source activate muninn && python muninn_backup.py'
+
+# ZSH
+alias zshconfig="nano ~/.zshrc"
+alias zshconfigst="subl3 ~/.zshrc"
+alias zshaliases="subl3 ~/.zsh.aliases"
+alias zshsource="source ~/.zshrc"
+
+# Compiling
+alias mst='make 2>&1 | colout -t cmake | colout -t g++'
+alias mstt='make 2>&1 | colout -t cmake | colout -t gtest'
+alias mmt='make -j9 2>&1 | colout -t cmake | colout -t g++ gtest'
+
+# Arch
+alias update='pacaur -Syu'
+
+# Git
+alias cdgit='cd ~/git'
+alias ulgc='git reset --soft HEAD~'
+
+# Bash/Path/Dir
+alias ls='ls -lah --color'
+alias tld='tree -d'
+alias tl='tree'
+alias sqrn='/bin/ls | cat -n | while read n f; do mv "$f" "$n.jpg"; done'
+
+# Wlan
+alias whome='sudo netctl start wlp3s0-niflheim'
+
+# Mounting
+alias mntwin='~/mount_win'
+alias mntdata='~/mount_data'
+alias mntnas='sshfs admin@192.168.178.162:/share ~/mnt'
+
+# Servers
+alias susanoo='ssh susanoo@kusanagi -p 51333'
+alias empyreum='ssh admin@192.168.178.162'
+alias nas='ssh admin@192.168.178.162'
+
+
+#Backup
+alias restic_backup="restic -r rest:http://empyreum:8000/ backup ~/ -e ~/photography -e ~/tmp -e ~/games -e ~/Downloads -e ~/mnt --force"
+alias restic_check="restic -r rest:http://empyreum:8000/ check"
+alias restic_prune="restic -r rest:http://empyreum:8000/ prune"
+alias restic_cmd="restic -r rest:http://empyreum:8000/"
+alias restic_usage='ssh admin@192.168.178.162 "du -sch /share/restic_backup/data"'
+
+# Other random stuff
+alias make_timelapse='ffmpeg -r 30 -pattern_type glob -i "*.jpg" -c:v copy output.avi'
+alias druck="lp -d HP_LaserJet_1320_series"
+alias ffzy='ls -l $(find -type f | fzy)'

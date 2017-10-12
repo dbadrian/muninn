@@ -1,0 +1,18 @@
+
+# <@generator-comment>
+
+daemon=300				# check every 300 seconds
+syslog=yes				# log update msgs to syslog
+mail=root				# mail all msgs to root
+mail-failure=root			# mail failed update msgs to root
+pid=/var/run/ddclient.pid	# record PID in file.
+ssl=yes				# use ssl-support.  Works with
+					# ssl-library
+postscript=<!s>POST_SCRIPT</!s>	# run script after updating.  The
+
+protocol=<!s>PROTOCOL</!s>
+use=web, web=checkip.dyndns.com/, web-skip='Current IP Address: '
+server=<!s>UPDATE_SERVER</!s>
+login=<!s>USERNAME</!s>
+password=<!s>MYPASSWD</!s>
+<!s>MYDOMAIN</!s>
