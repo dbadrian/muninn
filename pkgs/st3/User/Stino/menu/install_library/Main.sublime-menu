@@ -4017,6 +4017,17 @@
 											"command": "stino_install_lib",
 											"args": {"category": "Communication", "name": "NmraDcc", "version": "1.4.2"}
 										}
+									]								},
+									{
+									"caption": "NRFLite",
+									"id": "stino_lib_cat_name_NRFLite",
+									"children":
+									[										{"caption": "-"},
+										{											"caption": "1.1.0",
+											"id": "stino_lib_cat_name_ver_1.1.0",
+											"command": "stino_install_lib",
+											"args": {"category": "Communication", "name": "NRFLite", "version": "1.1.0"}
+										}
 									]								}
 								]							},
 							{
@@ -15641,6 +15652,17 @@
 										}
 									]								},
 									{
+									"caption": "ssd1306",
+									"id": "stino_lib_cat_name_ssd1306",
+									"children":
+									[										{"caption": "-"},
+										{											"caption": "1.1.1",
+											"id": "stino_lib_cat_name_ver_1.1.1",
+											"command": "stino_install_lib",
+											"args": {"category": "Display", "name": "ssd1306", "version": "1.1.1"}
+										}
+									]								},
+									{
 									"caption": "StivSeg",
 									"id": "stino_lib_cat_name_StivSeg",
 									"children":
@@ -17736,6 +17758,22 @@
 											"id": "stino_lib_cat_name_ver_0.1.1",
 											"command": "stino_install_lib",
 											"args": {"category": "Other", "name": "LEDMatrixDriver", "version": "0.1.1"}
+										}
+									]								},
+									{
+									"caption": "Log",
+									"id": "stino_lib_cat_name_Log",
+									"children":
+									[										{"caption": "-"},
+										{											"caption": "1.0.0",
+											"id": "stino_lib_cat_name_ver_1.0.0",
+											"command": "stino_install_lib",
+											"args": {"category": "Other", "name": "Log", "version": "1.0.0"}
+										},
+										{											"caption": "1.0.1",
+											"id": "stino_lib_cat_name_ver_1.0.1",
+											"command": "stino_install_lib",
+											"args": {"category": "Other", "name": "Log", "version": "1.0.1"}
 										}
 									]								},
 									{
@@ -20300,6 +20338,17 @@
 											"command": "stino_install_lib",
 											"args": {"category": "Sensors", "name": "HTS221", "version": "1.0.0"}
 										}
+									]								},
+									{
+									"caption": "HX711_ADC",
+									"id": "stino_lib_cat_name_HX711_ADC",
+									"children":
+									[										{"caption": "-"},
+										{											"caption": "1.0.0",
+											"id": "stino_lib_cat_name_ver_1.0.0",
+											"command": "stino_install_lib",
+											"args": {"category": "Sensors", "name": "HX711_ADC", "version": "1.0.0"}
+										}
 									]								}
 								]							},
 							{
@@ -21951,6 +22000,17 @@
 										}
 									]								},
 									{
+									"caption": "SparkFun AS726X",
+									"id": "stino_lib_cat_name_SparkFun AS726X",
+									"children":
+									[										{"caption": "-"},
+										{											"caption": "1.0.0",
+											"id": "stino_lib_cat_name_ver_1.0.0",
+											"command": "stino_install_lib",
+											"args": {"category": "Sensors", "name": "SparkFun AS726X", "version": "1.0.0"}
+										}
+									]								},
+									{
 									"caption": "SparkFun BME280",
 									"id": "stino_lib_cat_name_SparkFun BME280",
 									"children":
@@ -22408,6 +22468,17 @@
 								"id": "stino_lib_cat_initial_U",
 								"children":
 								[									{"caption": "-"},
+									{
+									"caption": "UltraDistSensor",
+									"id": "stino_lib_cat_name_UltraDistSensor",
+									"children":
+									[										{"caption": "-"},
+										{											"caption": "1.0.0",
+											"id": "stino_lib_cat_name_ver_1.0.0",
+											"command": "stino_install_lib",
+											"args": {"category": "Sensors", "name": "UltraDistSensor", "version": "1.0.0"}
+										}
+									]								},
 									{
 									"caption": "Ultrasonic",
 									"id": "stino_lib_cat_name_Ultrasonic",
@@ -23921,6 +23992,22 @@
 											"id": "stino_lib_cat_name_ver_1.2.4",
 											"command": "stino_install_lib",
 											"args": {"category": "Signal Input/Output", "name": "PinChangeInterrupt", "version": "1.2.4"}
+										}
+									]								},
+									{
+									"caption": "Polymorphic Buttons",
+									"id": "stino_lib_cat_name_Polymorphic Buttons",
+									"children":
+									[										{"caption": "-"},
+										{											"caption": "1.0.1",
+											"id": "stino_lib_cat_name_ver_1.0.1",
+											"command": "stino_install_lib",
+											"args": {"category": "Signal Input/Output", "name": "Polymorphic Buttons", "version": "1.0.1"}
+										},
+										{											"caption": "1.0.3",
+											"id": "stino_lib_cat_name_ver_1.0.3",
+											"command": "stino_install_lib",
+											"args": {"category": "Signal Input/Output", "name": "Polymorphic Buttons", "version": "1.0.3"}
 										}
 									]								},
 									{
