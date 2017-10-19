@@ -340,6 +340,11 @@
 										"id": "stino_platform_1.0.1",
 										"command": "stino_install_platform",
 										"args": {"package_name": "arduino", "platform_name": "Arduino nRF52 Boards", "version": "1.0.1"}
+									},
+									{										"caption": "1.0.2",
+										"id": "stino_platform_1.0.2",
+										"command": "stino_install_platform",
+										"args": {"package_name": "arduino", "platform_name": "Arduino nRF52 Boards", "version": "1.0.2"}
 									}
 								]							}
 						]

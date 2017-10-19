@@ -7,50 +7,58 @@
 [layouts]
   [[default]]
     [[[child0]]]
+      fullscreen = False
+      last_active_term = c5e9b8eb-af0a-42c7-91b5-c5dec0c7ac4e
+      last_active_window = True
+      maximised = True
       order = 0
       parent = ""
-      position = 0:24
-      size = 1920, 1004
+      position = 0:0
+      size = 1920, 1025
+      title = dadrian@ullr: ~
       type = Window
     [[[child1]]]
       order = 0
       parent = child0
-      position = 960
+      position = 958
+      ratio = 0.500261096606
       type = HPaned
     [[[child2]]]
       order = 0
       parent = child1
-      position = 502
+      position = 510
+      ratio = 0.5
       type = VPaned
     [[[child5]]]
       order = 1
       parent = child1
-      position = 502
+      position = 510
+      ratio = 0.5
       type = VPaned
     [[[terminal3]]]
-      command = ""
       order = 0
       parent = child2
       profile = default
       type = Terminal
+      uuid = 43826e00-b0d1-408a-a9ec-a55368d35259
     [[[terminal4]]]
-      command = ""
       order = 1
       parent = child2
       profile = default
       type = Terminal
+      uuid = c5e9b8eb-af0a-42c7-91b5-c5dec0c7ac4e
     [[[terminal6]]]
-      command = byobu -S 3
       order = 0
       parent = child5
       profile = default
       type = Terminal
+      uuid = 3f5af5a0-469d-4fa5-ae15-6fe8ca356e4f
     [[[terminal7]]]
-      command = ""
       order = 1
       parent = child5
       profile = default
       type = Terminal
+      uuid = 5041cb50-870a-4b70-a3c5-cf30a486301e
 [plugins]
 [profiles]
   [[default]]

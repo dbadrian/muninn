@@ -1,10 +1,19 @@
 {
+	"added_words":
+	[
+		"Zugspitze",
+		"Neuroscience",
+		"jpg",
+		"empyreum"
+	],
 	"color_scheme": "Packages/User/SublimeLinter/Monokai - Spacegray Eighties (SL).tmTheme",
+	"dictionary": "Packages/Language - English/en_US.dic",
 	"font_size": 13,
 	"ignored_packages":
 	[
 		"Vintage"
 	],
+	"spell_check": true,
 	"theme": "Soda Dark 3.sublime-theme",
 	"update_check": false
 }
