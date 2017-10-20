@@ -8,7 +8,7 @@
 	],
 	"color_scheme": "Packages/User/SublimeLinter/Monokai - Spacegray Eighties (SL).tmTheme",
 	"dictionary": "Packages/Language - English/en_US.dic",
-	"font_size": 13,
+	"font_size": 11,
 	"ignored_packages":
 	[
 		"Vintage"
