@@ -59,5 +59,4 @@ alias druck="lp -d HP_LaserJet_1320_series"
 alias ffzy='ls -l $(find -type f | fzy)'
 
 # Website
-alias commit_website='cd /home/dadrian/git/05_websites/dbadrian.github.io && git commit -am "automatic push" && git push origin master'
-alias push_website='make -C /home/dadrian/git/05_websites/dbadrian.github.io github'
+alias website_commit='cd /home/dadrian/git/05_websites/dbadrian.github.io && git commit -am "automatic push" && git push origin master'

@@ -15,6 +15,7 @@ pkg = {
 
     "install_path": "~/bin",
     "targets": [
+	"website_push",
         "tkill",
         "tsuspend",
         "moodle_dump",
