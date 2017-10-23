@@ -94,6 +94,9 @@ pkg = {
             "jdownloader2",
             "terminator",
             "xclip",
+            "ripgrep",
+            "fasd-git",
+            "diff-so-fancy",
 
             # Coding and Scripting
             "nano",

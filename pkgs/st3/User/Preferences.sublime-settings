@@ -6,7 +6,7 @@
 		"jpg",
 		"empyreum"
 	],
-	"color_scheme": "Packages/User/SublimeLinter/Monokai - Spacegray Eighties (SL).tmTheme",
+	"color_scheme": "Packages/Monokai - Spacegray/Monokai - Spacegray Eighties.tmTheme",
 	"dictionary": "Packages/Language - English/en_US.dic",
 	"font_size": 11,
 	"ignored_packages":
@@ -14,6 +14,7 @@
 		"Vintage"
 	],
 	"spell_check": true,
-	"theme": "Soda Dark 3.sublime-theme",
+	"theme": "Soda SolarizedDark.sublime-theme",
+	"translate_tabs_to_spaces": true,
 	"update_check": false
 }

@@ -91,5 +91,5 @@ export PATH=/opt/cuda/bin:$PATH
 
 export PATH=/home/dadrian/anaconda3/bin:$PATH
 
-export B2_ACCOUNT_KEY=001befd039b31723ab76242070b8a5381112bf7702
-export B2_ACCOUNT_ID=23dcb030c8e3
+export LD_LIBRARY_PATH=/opt/cuda/lib64:/opt/cuda/extras/CUPTI/lib64/:$LD_LIBRARY_PATH
+export CUDA_HOME=/opt/cuda/
