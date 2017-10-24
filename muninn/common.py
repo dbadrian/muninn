@@ -120,6 +120,15 @@ def replace_tags(text_input, key, value,
     return text_input.replace(opening_tag + key + closing_tag,  # Look For
                               value)                            # Replace by
 
+def get_params(fn_sample):
+    if not os.path.exists(fn_sample):
+        logger.error("\"%s\" does not exist. Can't load sample file.",
+                     fn_sample)
+        return None
+    else:
+        with open(fn_sample, 'r') as f_sample:
+            d_sample = f_sample.read()
+            return extract_value_from_tags(d_sample)
 
 # Git Interaction
 def get_changed_files(repo):
