@@ -45,6 +45,7 @@ def generate_supported_pkgs_string():
 def main():
     pkg_table = generate_supported_pkgs_string()
 
+
     with open("muninn/README.md.tpl", 'r') as f_sample:
         readme_txt = f_sample.read()
         readme_txt = common.replace_tags(readme_txt, "SUPPORTED_PACKAGES_PLACEHOLDER", pkg_table)
@@ -55,6 +56,15 @@ def main():
     # Place a comment at the specified location to notify user
     comment = "*Attention: This README was automatically generated at {}.*".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     readme_txt = readme_txt.replace("<@generator-comment>", comment)
+
+    with open("README.md", 'w') as f_output:
+        f_output.write(readme_txt)
+
+    # insert toc
+    with open("README.md", 'r') as f_sample:
+        readme_txt = f_sample.read()
+        sproc = common.run_linux_cmd("gh-md-toc README.md")
+        readme_txt = common.replace_tags(readme_txt, "TOC", sproc.stdout.decode("utf-8"))
 
     with open("README.md", 'w') as f_output:
         f_output.write(readme_txt)

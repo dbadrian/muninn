@@ -135,5 +135,8 @@ def get_changed_files(repo):
     return [item.a_path for item in repo.index.diff(None)]
 
 # System Interaction
-def run_linux_cmd(cmd):
-    subprocess.run(cmd.split())
+def run_linux_cmd(cmd, stdout=True):
+    if stdout:
+        return subprocess.run(cmd.split(), stdout=subprocess.PIPE)
+    else:
+        return subprocess.run(cmd.split())
