@@ -2,15 +2,17 @@
 
 <@generator-comment>
 
-Muninn is a small personal project to maintain, backup, synchronize dotfiles and other config files for my projects, tools (e.g., sublime, zsh), or backup-solutions.
+Muninn is a small personal project to maintain, backup, synchronize dotfiles and other config files for my projects, tools (e.g., sublime, zsh).
 It is not meant to be a general tool for everyone. Inspired by many other such projects. Just for fun and hopefully I can learn something.
+
+It features its own package/build system, allows to establish dependencies, install arch dependencies etc.
 
 <!s>TOC</!s>
 
 
 ## Requirements
 Requires anaconda (can easily be removed if you feel like it) at the moment as its fully integrated into my daily work flows.
-This repository contains a 
+This repository contains a conda environment file which can be used to create the proper environment, or used as guidelines if you drop the anaconda depedency.
 
 ```
 <!s>ANACONDA_REQUIREMENTS_FILE</!s>
