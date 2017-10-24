@@ -29,7 +29,8 @@ conda env export -n muninn | grep -v "^prefix: "> ${DIR}/muninn_conda_env
 
 # Auto generate new readme
 # TODO
-######
+source activate muninn
+python autogen_readme.py
 
 # Make new git commit
 git commit -am "$1"
