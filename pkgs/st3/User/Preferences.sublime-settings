@@ -4,7 +4,8 @@
 		"Zugspitze",
 		"Neuroscience",
 		"jpg",
-		"empyreum"
+		"empyreum",
+		"symlinks"
 	],
 	"color_scheme": "Packages/Monokai - Spacegray/Monokai - Spacegray Eighties.tmTheme",
 	"dictionary": "Packages/Language - English/en_US.dic",

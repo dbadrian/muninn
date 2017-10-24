@@ -5,6 +5,16 @@ import logging.config
 import json
 import errno
 import types
+import contextlib
+import shutil
+import tempfile
+import inspect
+import subprocess
+
+try:
+  from shutil import which
+except ImportError:
+  from distutils.spawn import find_executable as which
 
 # Logging
 def setup_logging(
@@ -33,6 +43,11 @@ def copy_func(f, name=None):
 
 
 # OS/Path-related stuff
+def get_current_module_folder():
+    frame = inspect.stack()[1]
+    module = inspect.getmodule(frame[0])
+    return os.path.abspath(module.__file__).rsplit('/', 1)[0]
+
 def get_immediate_subdirectories(a_dir):
     return [name for name in os.listdir(a_dir)
             if os.path.isdir(os.path.join(a_dir, name))]
@@ -56,6 +71,23 @@ def mkdir_p(path):
         else:
             raise
 
+@contextlib.contextmanager
+def cd(newdir, cleanup=lambda: True):
+    prevdir = os.getcwd()
+    os.chdir(os.path.expanduser(newdir))
+    try:
+        yield
+    finally:
+        os.chdir(prevdir)
+        cleanup()
+
+@contextlib.contextmanager
+def tempdir():
+    dirpath = tempfile.mkdtemp()
+    def cleanup():
+        shutil.rmtree(dirpath)
+    with cd(dirpath, cleanup):
+        yield dirpath
 
 # Text Processing
 def extract_value_from_tags(text_input,
@@ -76,3 +108,7 @@ def replace_tags(text_input, key, value,
 # Git Interaction
 def get_changed_files(repo):
     return [item.a_path for item in repo.index.diff(None)]
+
+# System Interaction
+def run_linux_cmd(cmd):
+    subprocess.run(cmd.split())

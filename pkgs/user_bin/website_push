@@ -1,0 +1,3 @@
+#!/bin/zsh
+source activate website
+make -C /home/dadrian/git/05_websites/dbadrian.github.io github

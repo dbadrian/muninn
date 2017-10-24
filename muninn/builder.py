@@ -41,17 +41,17 @@ def install(pkg):
         return False
 
     try:
-        logger.debug("running installer::%s::pkg_backup_func", pkg.path)
+        install_arch_dependencies(pkg.info["depends"]["arch"])
+    except Exception as e:
+        logger.exception("Installing arch:dependencies failed.")
+        return False
+
+    try:
+        logger.debug("running installer::%s::pkg_install_func", pkg.path)
         if "install" in dir(pkg):
             pkg.install(pkg.path, target_dir)
     except Exception as e:
         logger.exception("Install Step pkg.install failed.")
-        return False
-
-    try:
-        install_arch_dependencies(pkg.info["depends"]["arch"])
-    except Exception as e:
-        logger.exception("Installing arch:dependencies failed.")
         return False
 
     try:
