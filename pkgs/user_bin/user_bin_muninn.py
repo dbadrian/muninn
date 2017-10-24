@@ -15,6 +15,7 @@ pkg = {
 
     "install_path": "~/bin",
     "targets": [
+	"gh-md-toc",
 	"website_push",
         "tkill",
         "tsuspend",
