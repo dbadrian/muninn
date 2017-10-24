@@ -1,8 +1,8 @@
 # Muninn
 alias cdmuninn='cd ~/git/muninn'
-alias muninn_backup='source activate muninn && python muninn_backup.py'
+alias muninn_install='~/git/muninn/install.zsh'
+alias muninn_backup='~/git/muninn/backup.zsh'
 alias muninn_commit='cd ~/git/muninn && git commit -am "automatic backup and push" && git push origin master'
-alias muninn_install='cd ~/git/muninn && ./install.zsh'
 
 # ZSH
 alias zshconfig="nano ~/.zshrc"
