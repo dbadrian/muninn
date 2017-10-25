@@ -23,6 +23,7 @@ if [ $# -eq 0 ]
 fi
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd ${DIR}
 
 # Create latest conda env file
 conda env export -n muninn | grep -v "^prefix: "> ${DIR}/muninn_conda_env
