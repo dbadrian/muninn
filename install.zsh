@@ -16,6 +16,6 @@
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 source activate muninn
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 cd ${DIR}
 python install.py
