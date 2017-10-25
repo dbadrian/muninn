@@ -22,7 +22,9 @@ if [ $# -eq 0 ]
     exit
 fi
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+#DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$( cd "$(dirname "$0")" ; pwd -P )"
+echo $DIR
 cd ${DIR}
 
 # Create latest conda env file

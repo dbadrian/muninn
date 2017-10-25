@@ -107,8 +107,8 @@ pkg = {
             "arduino",
             "cuda",
             "cudnn",
-            "cudnn6",
             "graphviz",
+            "julia",
 
             # text editing and Tex
             "hunspell-de",
