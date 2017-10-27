@@ -23,12 +23,18 @@ import muninn.packages as packages
 logger = logging.getLogger(__name__)
 
 
-class PackageDatabase():
+class PackageManager():
     def __init__(self, pkg_dir):
         self.pkg_dir = os.path.abspath(pkg_dir)
         self.database_path = os.path.join(self.pkg_dir, ".database.json")
         self.is_initialized = self.__load_local_database()
         self.__scan_local_packages()
+
+    def install_packages(self, desired_pkgs):
+        # resolve dependencies
+        # install in install_order
+        # check if something is already installed
+        pass
 
     def initialize_new_database(self, overwrite=False):
         if os.path.isfile(self.database_path):

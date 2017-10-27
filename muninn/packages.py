@@ -31,7 +31,7 @@ class Package(object):
     the package instructions.
     """
 
-    def __init__(self, pkg_name, path_to_pkg, n_commits=-1):
+    def __init__(self, pkg_name, path_to_pkg, n_commits=1):
         self.path = path_to_pkg
         self.pkg_name = pkg_name
 
@@ -59,27 +59,30 @@ class Package(object):
         if version == "testing" or hash == "testing":
             # If the testing param was set, we use the current state of the folder
             # which might not be tracked as commit in the repository. Allows for testing of new packages.
-            logger.debug("Loading package in testing stage!")
+            logger.debug("Loading package at current state!")
             self.__load_module(self.path)
         else:
-            if version:
-                # Will be the correct hash or None if this version doesn't exist
-                logger.debug("Loading package at version=%s", version)
-                try:
-                    hash = self.version2hash[version]
-                except KeyError:
-                    logger.debug("Version not found!")
-                    return False
-            if hash in self.commits:
-                # checkout the folder into a temporary directory given the
-                logger.debug("Loading package at hash=%s", hash)
-                with common.tempdir() as tmp_dir_path:
-                    common.checkout_path_at_commit(self.path, hash,
-                                                   tmp_dir_path)
-                    self.__load_module(tmp_dir_path)
-            else:
-                logger.debug("Hash not found!")
-                return False
+            raise NotImplementedError
+            # TODO: Instead of symlinking, copy files!
+            # TODO: Only status=latest installed files are being tracked in the repo
+            # if version:
+            #     # Will be the correct hash or None if this version doesn't exist
+            #     logger.debug("Loading package at version=%s", version)
+            #     try:
+            #         hash = self.version2hash[version]
+            #     except KeyError:
+            #         logger.debug("Version not found!")
+            #         return False
+            # if hash in self.commits:
+            #     # checkout the folder into a temporary directory given the
+            #     logger.debug("Loading package at hash=%s", hash)
+            #     with common.tempdir() as tmp_dir_path:
+            #         common.checkout_path_at_commit(self.path, hash,
+            #                                        tmp_dir_path)
+            #         self.__load_module(tmp_dir_path)
+            # else:
+            #     logger.debug("Hash not found!")
+            #     return False
 
     def backup(self, pkg_dir, target_dir, backup_folder):
         pass

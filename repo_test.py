@@ -29,7 +29,7 @@ def main():
     common.setup_logging(level=logging.DEBUG)
     logger = logging.getLogger(__name__)
 
-    db = database.PackageDatabase("repository")
+    db = database.PackageManager("repository")
     db.initialize_new_database()
     for name, pkg in db.pkgs.items():
         for version in pkg.versions:
