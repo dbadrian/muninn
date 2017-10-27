@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
-import os
-import logging
 import datetime
+import logging
+import os
 
 import muninn.common as common
 import muninn.packages as packages
@@ -64,7 +64,8 @@ def main():
     with open("README.md", 'r') as f_sample:
         readme_txt = f_sample.read()
         sproc = common.run_linux_cmd("gh-md-toc README.md")
-        readme_txt = common.replace_tags(readme_txt, "TOC", sproc.stdout.decode("utf-8"))
+        readme_txt = common.replace_tags(readme_txt, "TOC", sproc.stdout.decode(
+            "utf-8"))
 
     with open("README.md", 'w') as f_output:
         f_output.write(readme_txt)

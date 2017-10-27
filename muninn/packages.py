@@ -16,6 +16,7 @@
 
 import logging
 import os
+import re
 import sys
 from importlib import import_module
 
@@ -30,17 +31,76 @@ class Package(object):
     the package instructions.
     """
 
-    def __init__(self, pkg_name, path_to_pkg):
+    def __init__(self, pkg_name, path_to_pkg, n_commits=-1):
         self.path = path_to_pkg
+        self.pkg_name = pkg_name
 
+        self.commits = common.get_commits(self.path, n_commits)
+        # collect all the version numbers by regex from the file
+        self.version2hash = {
+        self.__get_version_number_for_commit(commit): commit
+        for commit in self.commits}
+        # delete key None if present, as its a results from old commit references
+        if None in self.version2hash:
+            self.version2hash.pop(None, None)
+
+        self.versions = list(self.version2hash.keys())
+        self.versions.sort(reverse=True)
+
+    def load_module(self, version=None, hash=None):
+        logger.debug("Starting loading routine of pkg %s", self.pkg_name)
+        try:
+            assert version or hash, "Neither version or hash given!"
+            assert not version and hash or version and not hash, "Only version or hash can be defined!"
+        except AssertionError as e:
+            logger.debug(e)
+            return False
+
+        if version == "testing" or hash == "testing":
+            # If the testing param was set, we use the current state of the folder
+            # which might not be tracked as commit in the repository. Allows for testing of new packages.
+            logger.debug("Loading package in testing stage!")
+            self.__load_module(self.path)
+        else:
+            if version:
+                # Will be the correct hash or None if this version doesn't exist
+                logger.debug("Loading package at version=%s", version)
+                try:
+                    hash = self.version2hash[version]
+                except KeyError:
+                    logger.debug("Version not found!")
+                    return False
+            if hash in self.commits:
+                # checkout the folder into a temporary directory given the
+                logger.debug("Loading package at hash=%s", hash)
+                with common.tempdir() as tmp_dir_path:
+                    common.checkout_path_at_commit(self.path, hash,
+                                                   tmp_dir_path)
+                    self.__load_module(tmp_dir_path)
+            else:
+                logger.debug("Hash not found!")
+                return False
+
+    def backup(self, pkg_dir, target_dir, backup_folder):
+        pass
+
+    def install(self, pkg_dir, target_dir):
+        pass
+
+    def post_install(self, pkg_dir, target_dir):
+        pass
+
+    def clean(self, pkg_dir, target_dir):
+        pass
+
+    def __load_module(self, path):
         # Temporally add the pkg folder to sys.path, and remove it later. Since
         # all modules share the same name 'muninn_pkg', we will not be able to
         # load the next module correctly otherwise.
-        sys.path.append(path_to_pkg)
-        logger.debug("Loading pkg: %s", pkg_name + "_muninn")
-        pkg = import_module(pkg_name + "_muninn")
+        sys.path.append(path)
+        pkg = import_module(self.pkg_name + "_muninn")
 
-        if self.__validate_pkg(pkg, pkg_name):
+        if self.__validate_pkg(pkg, self.pkg_name):
             self.valid = True
             self.info = pkg.pkg
 
@@ -59,20 +119,13 @@ class Package(object):
             if "clean" in dir(pkg):
                 logger.debug("Added PKG Clean Function")
                 self.clean = pkg.clean
+
+            return True
         else:
+            logger.debug("Package %s not valid, skipping loading!",
+                         self.pkg_name)
             self.valid = False
-
-    def backup(self, pkg_dir, target_dir, backup_folder):
-        pass
-
-    def install(self, pkg_dir, target_dir):
-        pass
-
-    def post_install(self, pkg_dir, target_dir):
-        pass
-
-    def clean(self, pkg_dir, target_dir):
-        pass
+            return False
 
     def __validate_pkg(self, pkg, pkg_name):
         # Check if the user correctly edited the pkg
@@ -86,14 +139,29 @@ class Package(object):
 
         # Check if package does nothing
         if not pkg.pkg["depends"]["arch"] and \
-           not pkg.pkg["depends"]["muninn"] and \
-           not pkg.pkg["targets"] and \
-           "install" not in dir(pkg) and \
-           "post_install" not in dir(pkg):
+                not pkg.pkg["depends"]["muninn"] and \
+                not pkg.pkg["targets"] and \
+                        "install" not in dir(pkg) and \
+                        "post_install" not in dir(pkg):
             logger.error("Invalid Muninn PKG: No actions defined.")
             return False
 
         return True
+
+    def __get_version_number_for_commit(self, commit):
+        muninn_pkg_file = os.path.join(self.path, self.pkg_name + "_muninn.py")
+        content = common.get_file_at_commit(muninn_pkg_file, commit)
+        return self.__extract_version_number(content)
+
+    def __extract_version_number(self, file_content):
+        res = re.search('"version":\s*"([\d.]+)"', file_content)
+        if res:
+            return res.group(1)
+        else:
+            return None
+
+    def __load_hash(self, file_path, hash, output_path):
+        pass
 
 
 def search_packages(pkgs_path):
@@ -118,8 +186,8 @@ def search_packages(pkgs_path):
         # check if they contain a muninn pkg declaration (no validation!)
         packages = {pkg_candidate: os.path.join(pkgs_path, pkg_candidate)
                     for pkg_candidate in pkg_candidates if os.path.exists(
-                    os.path.join(pkgs_path, pkg_candidate,
-                                 pkg_candidate + "_muninn.py"))}
+            os.path.join(pkgs_path, pkg_candidate,
+                         pkg_candidate + "_muninn.py"))}
 
         logger.info("Found %i packages: %s", len(packages), packages)
         return packages

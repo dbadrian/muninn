@@ -18,13 +18,17 @@ import json
 import logging
 import os
 
+import muninn.packages as packages
+
 logger = logging.getLogger(__name__)
 
 
 class PackageDatabase():
     def __init__(self, pkg_dir):
-        self.database_path = os.path.join(pkg_dir, ".database.json")
-        self.is_initialized = self.__load_database()
+        self.pkg_dir = os.path.abspath(pkg_dir)
+        self.database_path = os.path.join(self.pkg_dir, ".database.json")
+        self.is_initialized = self.__load_local_database()
+        self.__scan_local_packages()
 
     def initialize_new_database(self, overwrite=False):
         if os.path.isfile(self.database_path):
@@ -34,15 +38,17 @@ class PackageDatabase():
             else:
                 return False
 
-        self.database = {}
-        with open(self.database_path, 'w') as db_file
+        self.database = {
+            "installed": {},
+        }
+        with open(self.database_path, 'w') as db_file:
             logger.debug("Creating empty database at %s.", self.database_path)
             json.dump(self.database, db_file, indent=4)
 
         self.is_initialized = True
         return True
 
-    def __load_database(self):
+    def __load_local_database(self):
         logger.debug("Loading package database from %s", self.database_path)
         try:
             with open(self.database_path, 'r') as db_file:
@@ -53,10 +59,22 @@ class PackageDatabase():
                          self.__class__.__name__)
             return False
 
-    def __save_database(self):
+    def __save_local_database(self):
         if self.is_initialized:
             logger.debug("Saving database at %s", self.database_path)
             with open(self.database_path, 'w') as db_file:
                 json.dump(self.database, db_file, indent=4)
         else:
             logger.debug("Database not initialized, not saving it!")
+
+    def __scan_local_packages(self):
+        # Search for packages
+        pkg_paths = packages.search_packages(self.pkg_dir)
+
+        # Load pkgs
+        self.pkgs = {name: packages.Package(name, path) for (name, path) in
+                pkg_paths.items()}
+
+        # Filter out invalid muninn pkgs
+        # self.pkgs = {name: pkg for (name, pkg) in pkgs.items() if pkg.valid}
+        # logger.debug("Valid muninn pkgs found: {}".format(self.pkgs))
