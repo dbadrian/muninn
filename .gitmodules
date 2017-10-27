@@ -1,0 +1,3 @@
+[submodule "repository"]
+	path = repository
+	url = git@github.com:dbadrian/muninn_package_repository.git
