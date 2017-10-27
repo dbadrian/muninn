@@ -7,6 +7,9 @@ It is not meant to be a general tool for everyone. There exist many other [solut
 
 It features its own package/build system, allows to establish dependencies, install arch dependencies etc.
 
+However, this is only a very first prototype. I am currently rewriting most of the package system, implement some basic version tracking, drop the anaconda requirement as far as possible.
+Remove the silly dialog dependency. I am also considering extracting the packages into their own (git-powered) repository.
+
 <!s>TOC</!s>
 
 

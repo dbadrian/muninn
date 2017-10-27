@@ -1,11 +1,14 @@
 # muninn
 
-*Attention: This README was automatically generated at 2017-10-25 14:34.*
+*Attention: This README was automatically generated at 2017-10-27 13:05.*
 
 Muninn is a small personal project to maintain, backup, synchronize dotfiles and other config files for my projects, tools (e.g., sublime, zsh).
 It is not meant to be a general tool for everyone. There exist many other [solutions](https://dotfiles.github.io/), so make sure to check them out!
 
 It features its own package/build system, allows to establish dependencies, install arch dependencies etc.
+
+However, this is only a very first prototype. I am currently rewriting most of the package system, implement some basic version tracking, drop the anaconda requirement as far as possible.
+Remove the silly dialog dependency. I am also considering extracting the packages into their own (git-powered) repository.
 
 
 Table of Contents
@@ -51,14 +54,14 @@ Muninn currently has (very customized support) for the following packages:
 
 Package Name | Version | Description | Dependencies Muninn
 --- | --- | --- | --- 
-zsh | 0.1 | ZSH Config Installer | *None*
-st3 | 0.2 | Sublime Text 3 - User Configs/Plugins | *None*
-system_setup | 0.1 | ArchLinux System-Configuration | *None*
-user_bin | 0.1 | Sync User Bin scripts | *None*
-terminator | 0.1 | Terminator Configuration | *None*
-tensorflow | 0.1 | Tensorflow compiled from source | *None*
-archpackages | 0.1 | Arch Linux Packages Installer | system_setup
-git | 0.1 | Git Config Installer | *None*
+zsh | 0.0.1 | ZSH Config Installer | *None*
+st3 | 0.0.1 | Sublime Text 3 - User Configs/Plugins | *None*
+system_setup | 0.0.1 | ArchLinux System-Configuration | *None*
+user_bin | 0.0.1 | Sync User Bin scripts | *None*
+terminator | 0.0.1 | Terminator Configuration | *None*
+tensorflow | 0.0.1 | Tensorflow compiled from source | *None*
+archpackages | 0.0.1 | Arch Linux Packages Installer | system_setup
+git | 0.0.1 | Git Config Installer | *None*
 
 
 ## Bootstrap

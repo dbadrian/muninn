@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 pkg = {
     "name": "zsh",
     "desc": "ZSH Config Installer",
-    "ver": 0.1,
+    "ver": "0.0.1",
     "depends": {
         "arch": [
             "zsh",

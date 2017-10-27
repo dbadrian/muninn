@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 pkg = {
     "name": "archpackages",
     "desc": "Arch Linux Packages Installer",
-    "ver": 0.1,
+    "ver": "0.0.1",
     "depends": {
         "arch": [
             # Laptop Energy Management
@@ -56,6 +56,8 @@ pkg = {
             # Encryption Tools
             "cryptsetup",
             "dislocker",
+            "pkgfile",
+            "pkgtools",
 
             # Important Libs
             # "ceres-solver",

@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 pkg = {
     "name": "tensorflow",
     "desc": "Tensorflow compiled from source",
-    "ver": 0.1,
+    "ver": "0.0.1",
     "depends": {
         "arch": [
             "cuda",
