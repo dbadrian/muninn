@@ -22,7 +22,7 @@ import os
 
 # muninn imports
 import muninn.common as common
-import muninn.database as database
+import muninn.package_manager as database
 
 
 def main():

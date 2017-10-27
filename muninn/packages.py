@@ -38,8 +38,8 @@ class Package(object):
         self.commits = common.get_commits(self.path, n_commits)
         # collect all the version numbers by regex from the file
         self.version2hash = {
-        self.__get_version_number_for_commit(commit): commit
-        for commit in self.commits}
+            self.__get_version_number_for_commit(commit): commit
+            for commit in self.commits}
         # delete key None if present, as its a results from old commit references
         if None in self.version2hash:
             self.version2hash.pop(None, None)

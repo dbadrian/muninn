@@ -18,6 +18,8 @@ import json
 import logging
 import os
 
+import muninn.builder as builder
+import muninn.depresolver as depresolver
 import muninn.packages as packages
 
 logger = logging.getLogger(__name__)
@@ -30,11 +32,57 @@ class PackageManager():
         self.is_initialized = self.__load_local_database()
         self.__scan_local_packages()
 
-    def install_packages(self, desired_pkgs):
-        # resolve dependencies
-        # install in install_order
-        # check if something is already installed
-        pass
+    def install_packages(self, desired_pkgs)
+        # first load all other packages (=potential depdencies) as latest pkg
+        gen = (x for x in self.pkgs.items() if x[0] not in desired_pkgs)
+        for name, pkg in gen:
+            pkg.load_module(version="latest")
+
+        # now load all desired modules in desired version
+        for pkg_name, version in desired_pkgs:
+            self.pkgs["pkg"].load_module(version=version)
+
+        depends_graph = depresolver.build_graph(self.pkgs)
+        install_order = depresolver.resolve_graph(depends_graph)
+
+        required_dependencies = set()
+        missing_dependencies = set()
+        skipped_packages = []
+        desired_pkg_names = set([name for name, _ in desired_pkgs])
+        for idx, pkg_name in enumerate(desired_pkg_names):
+            # Recursively search and check what pkgs are required
+            depends = set(
+                depresolver.find_dependencies(pkg_name, depends_graph))
+
+            if depends.issubset(
+                    install_order):  # if depends can be satisfied
+                # then collect those, which are not selected yet
+                required_dependencies.update(
+                    depends.difference(desired_pkg_names))
+            else:
+                missing_dependencies.update(
+                    depends.difference(install_order))
+                skipped_packages.append(pkg_name)
+                logger.error("Dependencies ({}) can not be satisfied for {}"
+                             .format(missing_dependencies, pkg_name))
+
+        depends_msg = "The following packages are required as dependencies,\
+                       and are automatically selected for installation."
+
+        logger.info(depends_msg + " {}".format(required_dependencies))
+        if skipped_packages:
+            logger.info("Following packages will be skipped: {}"
+                        .format(skipped_packages))
+
+        if required_dependencies:
+        # TODO: say some output or yes/no about the required dependncies
+        # or pacman style, list all to installs
+
+        for idx, pkg_name in enumerate(
+                        list(desired_pkg_names) + list(required_dependencies)):
+            if builder.install(self.pkgs[pkg_name]):
+                self.database["installed"][pkg_name] = "latest"
+
 
     def initialize_new_database(self, overwrite=False):
         if os.path.isfile(self.database_path):
@@ -79,7 +127,7 @@ class PackageManager():
 
         # Load pkgs
         self.pkgs = {name: packages.Package(name, path) for (name, path) in
-                pkg_paths.items()}
+                     pkg_paths.items()}
 
         # Filter out invalid muninn pkgs
         # self.pkgs = {name: pkg for (name, pkg) in pkgs.items() if pkg.valid}
