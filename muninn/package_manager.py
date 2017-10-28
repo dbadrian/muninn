@@ -18,9 +18,9 @@ import json
 import logging
 import os
 
+import muninn.builder as builder
 import muninn.depresolver as depresolver
 import muninn.packages as packages
-import muninn.builder as builder
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,8 @@ class PackageManager():
         self.is_initialized = self.__load_local_database()
         self.__scan_repository()
 
-    def install_packages(self, desired_pkgs, dry_run=False):
+    def install_packages(self, desired_pkgs, dry_run=False,
+                         force_reinstall=False):
         # check if desired packages exist
         filtered_pkgs = [pkg_blob for pkg_blob in desired_pkgs if
                          pkg_blob[0] in self.pkgs]
@@ -45,10 +46,7 @@ class PackageManager():
             logger.info(
                 "Following packages do not exit and will be skipped: \n%s", msg)
 
-        # first load all other packages (=potential dependencies) as latest pkg
-        # gen = (x for x in self.pkgs.items() if x[0] not in filtered_pkgs)
-        # for name, pkg in gen:
-        #     pkg.load_module(version="latest")
+        pkg2ver = {name: version for name, version in filtered_pkgs}
 
         # now load all desired modules in desired version
         for pkg_name, version in filtered_pkgs:
@@ -59,7 +57,12 @@ class PackageManager():
                                                               self.pkgs)
         install_order = depresolver.resolve_graph(depends_graph)
 
-        # TODO: Filter install order by already installed packages
+
+        if not force_reinstall:
+            logger.debug("Filtering packages by: 'already installed' and 'up2date'")
+            install_order = [pkg for pkg in install_order if
+                             pkg not in self.database["installed"] or
+                             self.database["installed"][pkg] != "latest"]
 
         logger.info(
             "Following packages (and required dependencies will be installed: "
@@ -75,7 +78,12 @@ class PackageManager():
         if not dry_run:
             for idx, pkg_name in enumerate(install_order):
                 if builder.install(self.pkgs[pkg_name]):
-                    self.database["installed"][pkg_name] = "latest"
+                    self.database["installed"][pkg_name] = pkg2ver[pkg_name]
+                else:
+                    return 1  # Failed installing a package. Abort!
+
+        self.__save_local_database()
+        return 0  # Successfully installed all packages
 
     def initialize_new_database(self, overwrite=False):
         if os.path.isfile(self.database_path):
@@ -104,7 +112,7 @@ class PackageManager():
         except FileNotFoundError:
             logger.debug("Couldn't find package database. %s not initialized!",
                          self.__class__.__name__)
-            return False
+            return self.initialize_new_database()
 
     def __save_local_database(self):
         if self.is_initialized:

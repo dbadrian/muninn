@@ -15,7 +15,9 @@
 #     You should have received a copy of the GNU Affero General Public License
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import argparse
 import logging
+import sys
 
 import muninn.common as common
 from muninn.package_manager import PackageManager
@@ -23,10 +25,12 @@ from muninn.package_manager import PackageManager
 common.setup_logging(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# !/usr/bin/env python
+try:
+    import coloredlogs
 
-import argparse
-import sys
+    coloredlogs.install(level='DEBUG')
+except:
+    pass
 
 
 def split_pkg_list_by_version(pkg_list, default_key='latest'):
@@ -42,14 +46,13 @@ def split_pkg_list_by_version(pkg_list, default_key='latest'):
 class Muninn(object):
     def __init__(self):
         parser = argparse.ArgumentParser(
-            usage='''muninn <command> [<args>]
-
-Available muninn commands:
-   install     Install (list of) package(s) (=version for specific version)
-   backup      Commits and pushes current state of muninn and repository
-   list        List all available packages
-''')
-        parser.add_argument('command', help='Subcommand to run')
+            usage='muninn <command> [<args>]\n\n'
+                'Available muninn commands:\n'
+                '   install     Install (list of) package(s) (=version for specific version)\n'
+                '   backup      Commits and pushes current state of muninn and repository\n'
+                '   list        List all available packages\n'
+        )
+        parser.add_argument('command', help='Command to run')
 
         # check if first arg exists as function
         args = parser.parse_args(sys.argv[1:2])
@@ -77,6 +80,7 @@ Available muninn commands:
                             help="Determined packages and depencies, but will "
                                  "not modify the system.")
         args = parser.parse_args(sys.argv[2:])
+        logger.debug("Called with args: %s", args)
         exit(self.__install(args))
 
     def backup(self):
@@ -111,7 +115,8 @@ Available muninn commands:
         desired_packages = split_pkg_list_by_version(args.packages)
         pm = PackageManager(args.repository)
 
-        pm.install_packages(desired_packages, dry_run=args.dry_run)
+        return pm.install_packages(desired_packages, dry_run=args.dry_run,
+                                   force_reinstall=args.force)
 
     def __backup(self, args):
         raise NotImplementedError
