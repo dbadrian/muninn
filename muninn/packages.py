@@ -56,7 +56,7 @@ class Package(object):
             logger.debug(e)
             return False
 
-        if version == "testing" or hash == "testing":
+        if version == "latest" or hash == "latest":
             # If the testing param was set, we use the current state of the folder
             # which might not be tracked as commit in the repository. Allows for testing of new packages.
             logger.debug("Loading package at current state!")

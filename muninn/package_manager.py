@@ -18,9 +18,9 @@ import json
 import logging
 import os
 
-import muninn.builder as builder
 import muninn.depresolver as depresolver
 import muninn.packages as packages
+import muninn.builder as builder
 
 logger = logging.getLogger(__name__)
 
@@ -30,59 +30,52 @@ class PackageManager():
         self.pkg_dir = os.path.abspath(pkg_dir)
         self.database_path = os.path.join(self.pkg_dir, ".database.json")
         self.is_initialized = self.__load_local_database()
-        self.__scan_local_packages()
+        self.__scan_repository()
 
-    def install_packages(self, desired_pkgs)
-        # first load all other packages (=potential depdencies) as latest pkg
-        gen = (x for x in self.pkgs.items() if x[0] not in desired_pkgs)
-        for name, pkg in gen:
-            pkg.load_module(version="latest")
+    def install_packages(self, desired_pkgs, dry_run=False):
+        # check if desired packages exist
+        filtered_pkgs = [pkg_blob for pkg_blob in desired_pkgs if
+                         pkg_blob[0] in self.pkgs]
+        dropped_pkgs = set(desired_pkgs).difference(set(filtered_pkgs))
+        if dropped_pkgs:
+            msg = ''.join(
+                ["    " + str(idx) + ": " + pkg_name + "\n" for
+                 idx, (pkg_name, _) in
+                 enumerate(dropped_pkgs)])
+            logger.info(
+                "Following packages do not exit and will be skipped: \n%s", msg)
+
+        # first load all other packages (=potential dependencies) as latest pkg
+        # gen = (x for x in self.pkgs.items() if x[0] not in filtered_pkgs)
+        # for name, pkg in gen:
+        #     pkg.load_module(version="latest")
 
         # now load all desired modules in desired version
-        for pkg_name, version in desired_pkgs:
-            self.pkgs["pkg"].load_module(version=version)
+        for pkg_name, version in filtered_pkgs:
+            logger.debug("Loading module: %s", pkg_name)
+            self.pkgs[pkg_name].load_module(version=version)
 
-        depends_graph = depresolver.build_graph(self.pkgs)
+        depends_graph, removed_pkgs = depresolver.build_graph(filtered_pkgs,
+                                                              self.pkgs)
         install_order = depresolver.resolve_graph(depends_graph)
 
-        required_dependencies = set()
-        missing_dependencies = set()
-        skipped_packages = []
-        desired_pkg_names = set([name for name, _ in desired_pkgs])
-        for idx, pkg_name in enumerate(desired_pkg_names):
-            # Recursively search and check what pkgs are required
-            depends = set(
-                depresolver.find_dependencies(pkg_name, depends_graph))
+        # TODO: Filter install order by already installed packages
 
-            if depends.issubset(
-                    install_order):  # if depends can be satisfied
-                # then collect those, which are not selected yet
-                required_dependencies.update(
-                    depends.difference(desired_pkg_names))
-            else:
-                missing_dependencies.update(
-                    depends.difference(install_order))
-                skipped_packages.append(pkg_name)
-                logger.error("Dependencies ({}) can not be satisfied for {}"
-                             .format(missing_dependencies, pkg_name))
+        logger.info(
+            "Following packages (and required dependencies will be installed: "
+            "%s",
+            install_order)
+        if removed_pkgs:
+            logger.info(
+                "Following packages (and dependencies) will not be installed "
+                "because of unresolved dependencies %s",
+                removed_pkgs)
 
-        depends_msg = "The following packages are required as dependencies,\
-                       and are automatically selected for installation."
-
-        logger.info(depends_msg + " {}".format(required_dependencies))
-        if skipped_packages:
-            logger.info("Following packages will be skipped: {}"
-                        .format(skipped_packages))
-
-        if required_dependencies:
-        # TODO: say some output or yes/no about the required dependncies
-        # or pacman style, list all to installs
-
-        for idx, pkg_name in enumerate(
-                        list(desired_pkg_names) + list(required_dependencies)):
-            if builder.install(self.pkgs[pkg_name]):
-                self.database["installed"][pkg_name] = "latest"
-
+        print("FINAL SELECTION:", install_order)
+        if not dry_run:
+            for idx, pkg_name in enumerate(install_order):
+                if builder.install(self.pkgs[pkg_name]):
+                    self.database["installed"][pkg_name] = "latest"
 
     def initialize_new_database(self, overwrite=False):
         if os.path.isfile(self.database_path):
@@ -121,7 +114,7 @@ class PackageManager():
         else:
             logger.debug("Database not initialized, not saving it!")
 
-    def __scan_local_packages(self):
+    def __scan_repository(self):
         # Search for packages
         pkg_paths = packages.search_packages(self.pkg_dir)
 
