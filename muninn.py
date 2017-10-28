@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 try:
     import coloredlogs
 
-    coloredlogs.install(level='DEBUG')
+    coloredlogs.install(level='ERROR')
 except:
     pass
 
@@ -47,10 +47,11 @@ class Muninn(object):
     def __init__(self):
         parser = argparse.ArgumentParser(
             usage='muninn <command> [<args>]\n\n'
-                'Available muninn commands:\n'
-                '   install     Install (list of) package(s) (=version for specific version)\n'
-                '   backup      Commits and pushes current state of muninn and repository\n'
-                '   list        List all available packages\n'
+                  'Available muninn commands:\n'
+                  '   install     Install (list of) package(s) (=version for specific version)\n'
+                  '   remove      Remove installed package(s) and restore local backups\n'
+                  '   backup      Commits and pushes current state of muninn and repository\n'
+                  '   list        List all available packages\n'
         )
         parser.add_argument('command', help='Command to run')
 
@@ -69,7 +70,7 @@ class Muninn(object):
                         'version)')
         # prefixing the argument with -- means it's optional
         parser.add_argument('-f', '--force', action='store_true',
-                            help="Force re-installation if package is already "
+                            help="Force re-installation if package(s) is already "
                                  "installed.")
         parser.add_argument('-p', '--packages', nargs='+', required=True,
                             help='(List of) desired package(s)')
@@ -77,11 +78,14 @@ class Muninn(object):
                             default='./repository',
                             help='Non-default location of repository.')
         parser.add_argument('--dry_run', action='store_true', required=False,
-                            help="Determined packages and depencies, but will "
-                                 "not modify the system.")
+                            help="Prints detailed output of changes, but no "
+                                 "actual modification of the system occurs!")
         args = parser.parse_args(sys.argv[2:])
         logger.debug("Called with args: %s", args)
         exit(self.__install(args))
+
+    def remove(self):
+        raise NotImplementedError
 
     def backup(self):
         parser = argparse.ArgumentParser(
@@ -115,8 +119,48 @@ class Muninn(object):
         desired_packages = split_pkg_list_by_version(args.packages)
         pm = PackageManager(args.repository)
 
-        return pm.install_packages(desired_packages, dry_run=args.dry_run,
-                                   force_reinstall=args.force)
+        print(":: Resolving Dependencies")
+        install_order, removed_pkgs = pm.load_and_resolve_dependencies(
+            desired_packages)
+
+        if removed_pkgs:
+            msg = "Following packages removed due to unresolved dependencies:\n" \
+                  + ''.join(
+                ["   " + str(idx) + ". " + pkg_name + "\n" for idx, pkg_name in
+                 enumerate(removed_pkgs)]) + "\n\n"
+            print(msg)
+            logger.info(
+                "Following packages (and dependencies) will not be installed, "
+                "because of unresolved dependencies: %s", removed_pkgs)
+
+        not_installed = []
+        incorrect_version = []
+        if not args.force:
+            not_installed, incorrect_version = pm.filter_install_order(
+                install_order)
+            logger.debug("Incorrect Version %s", incorrect_version)
+
+            install_order = not_installed + incorrect_version
+
+        print(":: Installing packages")
+        if not_installed:
+            msg = "".join(
+                ["   " + str(idx) + ". " + name + " ==> " + version + "\n" for
+                 idx, (name, version) in enumerate(not_installed)]) + "\n"
+            print(msg)
+
+        if incorrect_version:
+            msg = "".join(["   {}. {} ==> {} (from {})\n".format(str(idx), name,
+                                                                 version,
+                                                                 pm.installed_package_version(
+                                                                     name)) for
+                           idx, (name, version) in
+                           enumerate(incorrect_version)])
+            print(msg)
+
+
+        print("YES OR NO STILL MISSING!")
+        # return pm.install_packages(install_order, dry_run=args.dry_run)
 
     def __backup(self, args):
         raise NotImplementedError

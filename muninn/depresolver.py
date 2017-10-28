@@ -44,10 +44,8 @@ class Node:
 def build_graph(desired_pkgs, pkgs):
     # Create Nodes of all desired packages which are already loaded
     graph = {pkgs[pkg_name].info["name"]: (Node(pkgs[pkg_name].info["name"]),
-                                tuple(pkgs[pkg_name].info["depends"]["muninn"]))
-             for pkg_name, _ in desired_pkgs}
-
-    print(graph)
+                                           tuple(pkgs[pkg_name].info["depends"]["muninn"]))
+             for pkg_name in desired_pkgs}
 
     # will contain those packages, for which dependencies
     # can not be satisfied, since there is no muninn pkg
@@ -78,11 +76,12 @@ def build_graph(desired_pkgs, pkgs):
         logger.debug("Removing {} and parents from graph".format(pkg))
         remove_node_from_graph(pkg, graph, removed_pkgs)
 
-    logger.error(
+    removed_desired_pkgs = [pkg for pkg in removed_pkgs if pkg in desired_pkgs]
+    logger.debug(
         "Following pkgs were removed as dependencies can not be met: {}"
-        .format(removed_pkgs))
+            .format(removed_pkgs))
 
-    return graph, set(removed_pkgs)
+    return graph, set(removed_desired_pkgs)
 
 def recursive_dependecies_add(dependency, graph, pkgs):
     if dependency in pkgs:

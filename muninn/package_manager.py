@@ -32,8 +32,7 @@ class PackageManager():
         self.is_initialized = self.__load_local_database()
         self.__scan_repository()
 
-    def install_packages(self, desired_pkgs, dry_run=False,
-                         force_reinstall=False):
+    def load_and_resolve_dependencies(self, desired_pkgs):
         # check if desired packages exist
         filtered_pkgs = [pkg_blob for pkg_blob in desired_pkgs if
                          pkg_blob[0] in self.pkgs]
@@ -53,32 +52,42 @@ class PackageManager():
             logger.debug("Loading module: %s", pkg_name)
             self.pkgs[pkg_name].load_module(version=version)
 
-        depends_graph, removed_pkgs = depresolver.build_graph(filtered_pkgs,
-                                                              self.pkgs)
+        depends_graph, removed_pkgs = depresolver.build_graph(
+            [n for n, v in filtered_pkgs], self.pkgs)
         install_order = depresolver.resolve_graph(depends_graph)
 
+        install_order_with_version = [(pkg, pkg2ver[pkg]) for pkg in
+                                      install_order]
 
-        if not force_reinstall:
-            logger.debug("Filtering packages by: 'already installed' and 'up2date'")
-            install_order = [pkg for pkg in install_order if
-                             pkg not in self.database["installed"] or
-                             self.database["installed"][pkg] != "latest"]
+        # return ordered! list of packages to be installed
+        #  and list of all packages which were removed as they cant be installed
+        return install_order_with_version, removed_pkgs
 
+    def filter_install_order(self, install_order):
+        logger.debug(
+            "Filtering packages by: 'already installed' and 'up2date'")
+
+        # Filter by not installed yet
+        not_installed = [(pkg, version) for pkg, version in install_order if
+                         pkg not in self.database["installed"]]
+
+        incorrect_version = [(pkg, version) for pkg, version in
+                             install_order if
+                             pkg in self.database["installed"] and
+                             self.database["installed"][pkg] != version]
+
+        return not_installed, incorrect_version
+
+    def install_packages(self, install_order, dry_run=False):
         logger.info(
             "Following packages (and required dependencies will be installed: "
             "%s",
             install_order)
-        if removed_pkgs:
-            logger.info(
-                "Following packages (and dependencies) will not be installed "
-                "because of unresolved dependencies %s",
-                removed_pkgs)
 
-        print("FINAL SELECTION:", install_order)
         if not dry_run:
-            for idx, pkg_name in enumerate(install_order):
+            for idx, (pkg_name, version) in enumerate(install_order):
                 if builder.install(self.pkgs[pkg_name]):
-                    self.database["installed"][pkg_name] = pkg2ver[pkg_name]
+                    self.database["installed"][pkg_name] = version
                 else:
                     return 1  # Failed installing a package. Abort!
 
@@ -102,6 +111,12 @@ class PackageManager():
 
         self.is_initialized = True
         return True
+
+    def installed_package_version(self, pkg_name):
+        try:
+            return self.database["installed"][pkg_name]
+        except:
+            return ["not installed"]
 
     def __load_local_database(self):
         logger.debug("Loading package database from %s", self.database_path)
