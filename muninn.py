@@ -42,14 +42,12 @@ def split_pkg_list_by_version(pkg_list, default_key='latest'):
 class Muninn(object):
     def __init__(self):
         parser = argparse.ArgumentParser(
-            # description='Pretends to be git',
             usage='''muninn <command> [<args>]
 
-The most commonly used git commands are:
+Available muninn commands:
    install     Install (list of) package(s) (=version for specific version)
    backup      Commits and pushes current state of muninn and repository
    list        List all available packages
-   sync        No idea what that should be...
 ''')
         parser.add_argument('command', help='Subcommand to run')
 
@@ -88,7 +86,6 @@ The most commonly used git commands are:
         parser.add_argument('repository')
         args = parser.parse_args(sys.argv[2:])
         exit(self.__backup(args))
-        # print('Running git fetch, repository=%s' % args.repository)
 
     def list(self):
         parser = argparse.ArgumentParser(
@@ -109,9 +106,6 @@ The most commonly used git commands are:
         args = parser.parse_args(sys.argv[2:])
         exit(self.__list(args))
 
-    def sync(self):
-        raise NotImplementedError
-
     def __install(self, args):
         # parse packages into pkg and desired version if given
         desired_packages = split_pkg_list_by_version(args.packages)
@@ -120,10 +114,10 @@ The most commonly used git commands are:
         pm.install_packages(desired_packages, dry_run=args.dry_run)
 
     def __backup(self, args):
-        pass
+        raise NotImplementedError
 
     def __list(self, args):
-        pm = PackageManager(args.repository)
+        raise NotImplementedError
 
 
 if __name__ == '__main__':
