@@ -83,18 +83,17 @@ class PackageManager():
 
         return not_installed, incorrect_version
 
-    def install_packages(self, install_order, dry_run=False):
+    def install_packages(self, install_order):
         logger.info(
             "Following packages (and required dependencies will be installed: "
             "%s",
             install_order)
 
-        if not dry_run:
-            for idx, (pkg_name, version) in enumerate(install_order):
-                if builder.install(self.pkgs[pkg_name]):
-                    self.database["installed"][pkg_name] = version
-                else:
-                    return 1  # Failed installing a package. Abort!
+        for idx, (pkg_name, version) in enumerate(install_order):
+            if builder.install(self.pkgs[pkg_name]):
+                self.database["installed"][pkg_name] = version
+            else:
+                return 1  # Failed installing a package. Abort!
 
         self.__save_local_database()
         return 0  # Successfully installed all packages

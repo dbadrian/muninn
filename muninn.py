@@ -76,7 +76,7 @@ class Muninn(object):
                             help='(List of) desired package(s)')
         parser.add_argument('-r', '--repository', type=str, required=False,
                             default='./repository',
-                            help='Non-default location of repository.')
+                            help='Non-default location of local repository.')
         parser.add_argument('--dry_run', action='store_true', required=False,
                             help="Prints detailed output of changes, but no "
                                  "actual modification of the system occurs!")
@@ -147,7 +147,7 @@ class Muninn(object):
             print(" ==> Nothing to install, bye!")
             exit(0)
 
-        print(":: Installing packages")
+        print(":: Installing packages" + " (dry-run)" if args.dry_run else "")
         if not_installed:
             msg = "".join(
                 ["   " + str(idx) + ". " + name + " ==> " + version + "\n" for
@@ -163,8 +163,8 @@ class Muninn(object):
                            enumerate(incorrect_version)])
             print(msg)
 
-        if common.yes_or_no("Please confirm the changes above to continue."):
-            return pm.install_packages(install_order, dry_run=args.dry_run)
+        if not args.dry_run and common.yes_or_no("Please confirm the changes above to continue."):
+            return pm.install_packages(install_order)
 
     def __backup(self, args):
         raise NotImplementedError
