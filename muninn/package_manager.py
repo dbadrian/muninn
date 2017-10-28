@@ -56,11 +56,16 @@ class PackageManager():
             [n for n, v in filtered_pkgs], self.pkgs)
         install_order = depresolver.resolve_graph(depends_graph)
 
+        # Update pkg2ver with newly added dependencies without overwriting "latest"
+        pkg2ver.update(
+            {self.pkgs[name].info["name"]: self.pkgs[name].info["version"] for
+             name, version in self.pkgs.items() if
+             hasattr(self.pkgs[name], "info") and not name in pkg2ver})
+
+        # "zip" install order of pkgs with respective desired version
         install_order_with_version = [(pkg, pkg2ver[pkg]) for pkg in
                                       install_order]
 
-        # return ordered! list of packages to be installed
-        #  and list of all packages which were removed as they cant be installed
         return install_order_with_version, removed_pkgs
 
     def filter_install_order(self, install_order):

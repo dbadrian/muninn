@@ -184,3 +184,14 @@ def run_linux_cmd(cmd, stdout=True, cwd=None, shell=False):
                               shell=shell)
     else:
         return subprocess.run(cmd.split(), cwd=cwd, shell=shell)
+
+
+# useful python snippets
+def yes_or_no(question):
+    reply = str(input(question+' (y/n): ')).lower().strip()
+    if reply[0] == 'y':
+        return True
+    if reply[0] == 'n':
+        return False
+    else:
+        return yes_or_no("Uhhhh... please enter a correct one...")

@@ -142,6 +142,11 @@ class Muninn(object):
 
             install_order = not_installed + incorrect_version
 
+        # if nothing to install, do an early exit
+        if not install_order:
+            print(" ==> Nothing to install, bye!")
+            exit(0)
+
         print(":: Installing packages")
         if not_installed:
             msg = "".join(
@@ -158,9 +163,8 @@ class Muninn(object):
                            enumerate(incorrect_version)])
             print(msg)
 
-
-        print("YES OR NO STILL MISSING!")
-        # return pm.install_packages(install_order, dry_run=args.dry_run)
+        if common.yes_or_no("Please confirm the changes above to continue."):
+            return pm.install_packages(install_order, dry_run=args.dry_run)
 
     def __backup(self, args):
         raise NotImplementedError
