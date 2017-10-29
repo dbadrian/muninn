@@ -281,12 +281,13 @@ def generate_supported_pkgs_string(pkgs):
 # useful python snippets
 def yes_or_no(question):
     reply = str(input(question + ' (y/n): ')).lower().strip()
-    if reply[0] == 'y':
-        return True
-    if reply[0] == 'n':
-        return False
-    else:
-        return yes_or_no("Uhhhh... please enter a correct one...")
+    if len(reply) > 0:
+        if reply[0] == 'y':
+            return True
+        if reply[0] == 'n':
+            return False
+
+    return yes_or_no("Uhhhh... please enter a correct one...")
 
 
 def message_from_sys_editor(initial_message=""):
