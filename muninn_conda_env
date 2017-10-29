@@ -13,5 +13,10 @@ dependencies:
 - xz=5.2.2=1
 - zlib=1.2.8=3
 - pip:
+  - coloredlogs==7.3
+  - gitdb2==2.0.3
+  - gitpython==2.1.7
+  - humanfriendly==4.4.1
   - pythondialog==3.4.0
+  - smmap2==2.0.3
 
