@@ -28,9 +28,9 @@ logger = logging.getLogger(__name__)
 class PackageManager():
     def __init__(self, pkg_dir):
         self.pkg_dir = os.path.abspath(pkg_dir)
+        self.__scan_repository()
         self.database_path = os.path.join(self.pkg_dir, ".database.json")
         self.is_initialized = self.__load_local_database()
-        self.__scan_repository()
 
     def load_packages(self, packages, version="latest"):
         for pkg_name in packages:
@@ -113,7 +113,13 @@ class PackageManager():
 
         self.database = {
             "installed": {},
+            "available": {}
         }
+
+        for name, pkg in self.pkgs.items():
+            pkg.load_module(version="latest")
+            self.database["available"][name] = pkg.info
+
         with open(self.database_path, 'w') as db_file:
             logger.debug("Creating empty database at %s.", self.database_path)
             json.dump(self.database, db_file, indent=4)

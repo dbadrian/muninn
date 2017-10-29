@@ -260,6 +260,23 @@ def bump_version(version, major=False, minor=False, patch=True):
     if patch: pa += 1
     return '.'.join([str(ma), str(mi), str(pa)])
 
+def make_pkg_string(pkg):
+# [(pkg.info["name"], pkg.info["desc"], False)
+#                for pkg in pkgs.values()]
+    pkg_deps = " ".join(pkg.info["depends"]["muninn"]) if pkg.info["depends"]["muninn"] else "*None*"
+    base_pkg_string = str(pkg.info["name"]) + " | " \
+                     + str(pkg.info["ver"])  +" | " \
+                     + str(pkg.info["desc"]) + " | " \
+                     + pkg_deps + "\n"
+    return base_pkg_string
+
+
+def generate_supported_pkgs_string(pkgs):
+    table_str = "Package Name | Version | Description | Dependencies Muninn\n--- | --- | --- | --- \n"
+    for (name, pkg) in pkgs.items():
+        table_str += make_pkg_string(pkg)
+
+    return table_str
 
 # useful python snippets
 def yes_or_no(question):
