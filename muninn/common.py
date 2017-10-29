@@ -265,7 +265,7 @@ def make_pkg_string(pkg):
 #                for pkg in pkgs.values()]
     pkg_deps = " ".join(pkg.info["depends"]["muninn"]) if pkg.info["depends"]["muninn"] else "*None*"
     base_pkg_string = str(pkg.info["name"]) + " | " \
-                     + str(pkg.info["ver"])  +" | " \
+                     + str(pkg.info["version"])  +" | " \
                      + str(pkg.info["desc"]) + " | " \
                      + pkg_deps + "\n"
     return base_pkg_string
@@ -273,7 +273,7 @@ def make_pkg_string(pkg):
 
 def generate_supported_pkgs_string(pkgs):
     table_str = "Package Name | Version | Description | Dependencies Muninn\n--- | --- | --- | --- \n"
-    for (name, pkg) in pkgs.items():
+    for (name, pkg) in sorted(pkgs.items()):
         table_str += make_pkg_string(pkg)
 
     return table_str

@@ -16,6 +16,7 @@
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import argparse
+import datetime
 import logging
 import os
 import sys
@@ -179,6 +180,7 @@ class Muninn(object):
 
         # print summary of all modified files and changes according to current
         changed = common.get_changed_files(args.repository)
+        changed = [file for file in changed if len(file.split(os.sep)) > 1]
         changed_g = {k: list(g) for k, g in
                      groupby(changed, lambda s: s.split(os.sep)[0])}
         untracked = common.get_untracked_files(args.repository)
@@ -247,28 +249,42 @@ class Muninn(object):
         # Bump versions
         pm.pkgs[pkg].bump_version_number(False, False, True)
 
+        # Update Readme
+        pm.load_all_modules()
+        pkg_table = common.generate_supported_pkgs_string(pm.pkgs)
+        with open("templates/repository_readme.tpl", 'r') as f_sample:
+            readme_txt = f_sample.read()
+            readme_txt = common.replace_tags(readme_txt,
+                                             "SUPPORTED_PACKAGES_PLACEHOLDER",
+                                             pkg_table)
 
-        # TODO: regenerate repository readme
+        # Place a comment at the specified location to notify user
+        comment = "*Attention: This README was automatically generated at {}.*".format(
+            datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+        readme_txt = readme_txt.replace("<@generator-comment>", comment)
 
-        # # git add those files
-        # common.stage_files(args.repository, files_to_stage)
-        #
-        # # a git commit # get message of user via the actual git commit tool if necessary
-        # msg = args.message
-        # if not msg:
-        #     msg = "\n\n" \
-        #           "############################################################\n" \
-        #           "# Please shortly summarize all the changes made to the repo! \n" \
-        #           "# Lines (= files) starting with '#' will be ignored.\n" \
-        #           "# First line is short summary, following lines are extended.\n" \
-        #           "############################################################\n\n"
-        #
-        #     msg = common.message_from_sys_editor(msg)
-        #
-        # common.commit(args.repository, message=msg)
+        with open(os.path.join(args.repository, "README.md"), 'w') as f_output:
+            f_output.write(readme_txt)
 
-        # print("\nPushing new commit to remote repository.")
-        # common.push(args.repository)
+        # git add those files
+        common.stage_files(args.repository, files_to_stage + ["README.md"])
+
+        # a git commit # get message of user via the actual git commit tool if necessary
+        msg = args.message
+        if not msg:
+            msg = "\n\n" \
+                  "############################################################\n" \
+                  "# Please shortly summarize all the changes made to the repo! \n" \
+                  "# Lines (= files) starting with '#' will be ignored.\n" \
+                  "# First line is short summary, following lines are extended.\n" \
+                  "############################################################\n\n"
+
+            msg = common.message_from_sys_editor(msg)
+
+        common.commit(args.repository, message=msg)
+
+        print("\n... Pushing new commit to remote repository.")
+        common.push(args.repository)
 
     def __list(self, args):
         raise NotImplementedError

@@ -112,13 +112,8 @@ class PackageManager():
                 return False
 
         self.database = {
-            "installed": {},
-            "available": {}
+            "installed": {}
         }
-
-        for name, pkg in self.pkgs.items():
-            pkg.load_module(version="latest")
-            self.database["available"][name] = pkg.info
 
         with open(self.database_path, 'w') as db_file:
             logger.debug("Creating empty database at %s.", self.database_path)
@@ -132,6 +127,15 @@ class PackageManager():
             return self.database["installed"][pkg_name]
         except:
             return ["not installed"]
+
+    def load_all_modules(self, reload=True):
+        if reload:
+            logger.debug("Deleting pkgs dict and rescan repository.")
+            self.pkgs.clear()
+            self.__scan_repository()
+
+        for name, pkg in self.pkgs.items():
+            pkg.load_module(version="latest")
 
     def __load_local_database(self):
         logger.debug("Loading package database from %s", self.database_path)

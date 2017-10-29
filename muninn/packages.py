@@ -18,7 +18,7 @@ import logging
 import os
 import re
 import sys
-from importlib import import_module
+from importlib import import_module, reload
 
 import muninn.common as common
 
