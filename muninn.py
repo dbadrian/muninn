@@ -17,7 +17,9 @@
 
 import argparse
 import logging
+import os
 import sys
+from itertools import groupby
 
 import muninn.common as common
 from muninn.package_manager import PackageManager
@@ -68,7 +70,6 @@ class Muninn(object):
         parser = argparse.ArgumentParser(
             description='Install (list of) package(s) (=version for specific '
                         'version)')
-        # prefixing the argument with -- means it's optional
         parser.add_argument('-f', '--force', action='store_true',
                             help="Force re-installation if package(s) is already "
                                  "installed.")
@@ -89,9 +90,15 @@ class Muninn(object):
 
     def backup(self):
         parser = argparse.ArgumentParser(
-            description='Backup something?')
-        # NOT prefixing the argument with -- means it's not optional
-        parser.add_argument('repository')
+            description='Backup packages by creating a new commit and pushing.')
+        parser.add_argument('-m', '--message', type=str, required=False,
+                            help='Message for this commit.')
+        parser.add_argument('-d', '--detailed', action='store_true',
+                            required=False, help="Extended informations.")
+        parser.add_argument('-r', '--repository', type=str, required=False,
+                            default='repository',
+                            help='Non-default location of local repository.')
+
         args = parser.parse_args(sys.argv[2:])
         exit(self.__backup(args))
 
@@ -163,11 +170,94 @@ class Muninn(object):
                            enumerate(incorrect_version)])
             print(msg)
 
-        if not args.dry_run and common.yes_or_no("Please confirm the changes above to continue."):
+        if not args.dry_run and common.yes_or_no(
+                "Please confirm the changes above to continue."):
             return pm.install_packages(install_order)
 
     def __backup(self, args):
-        raise NotImplementedError
+        pm = PackageManager(args.repository)
+
+        # print summary of all modified files and changes according to current
+        changed = common.get_changed_files(args.repository)
+        changed_g = {k: list(g) for k, g in
+                     groupby(changed, lambda s: s.split(os.sep)[0])}
+        untracked = common.get_untracked_files(args.repository)
+        untracked_g = {k: list(g) for k, g in
+                       groupby(untracked, lambda s: s.split(os.sep)[0])}
+
+        changed_pkgs = set(
+            [path.split(os.sep)[0] for path in changed + untracked])
+
+        print("\nPackages staged for commit:\n   {}".format(
+            "\n   ".join(changed_pkgs)))
+
+        if args.detailed:
+            print("\nFiles modified / deleted since last commit:")
+            for path in changed:
+                print('\tmodified:', path)
+
+            print("\nFiles not tracked yet:")
+            for path in untracked:
+                print('\tmodified:', path)
+
+        # generate text with grouping by packages and list modified and untracked
+        # files. everything without a hashtag will be added to comming up commit.
+        pkg_msg = "############################################################\n" \
+                  "#### {}\n" \
+                  "############################################################\n" \
+                  "# modified / deleted files:\n" \
+                  "{}\n" \
+                  "# untracked files:\n" \
+                  "{}\n\n"
+
+        msg = "############################################################\n" \
+              "# Please confirm the changes which will be recorded in the \n" \
+              "# commit. Lines (= files) starting with '#' will be ignored.\n" \
+              "############################################################\n\n"
+
+        for pkg in changed_pkgs:
+            s_changed = "\n".join(
+                changed_g[pkg]) if pkg in changed_g else "# <no changes> "
+            s_untracked = "\n".join(
+                untracked_g[pkg]) if pkg in untracked_g else "# <no changes>"
+
+            msg += pkg_msg.format(pkg, s_changed, s_untracked)
+
+        ret = common.message_from_sys_editor(msg)
+        files_to_stage = common.get_non_comment_lines(ret)
+
+        print("\nFollowing files have been selected for staging:\n")
+        for file in files_to_stage:
+            print("    ", file)
+
+        print("\nIncrementing package versions as following:")
+        for pkg in changed_pkgs:
+            print("    ", pkg, ": old version ==> new version")
+
+        if not common.yes_or_no("\nCommit the changes above?"):
+            exit(0)
+
+        # do a version bump and remember changes
+
+        # # git add those files
+        # common.stage_files(args.repository, files_to_stage)
+        #
+        # # a git commit # get message of user via the actual git commit tool if necessary
+        # msg = args.message
+        # if not msg:
+        #     msg = "\n\n" \
+        #           "############################################################\n" \
+        #           "# Please shortly summarize all the changes made to the repo! \n" \
+        #           "# Lines (= files) starting with '#' will be ignored.\n" \
+        #           "# First line is short summary, following lines are extended.\n" \
+        #           "############################################################\n\n"
+        #
+        #     msg = common.message_from_sys_editor(msg)
+        #
+        # common.commit(args.repository, message=msg)
+
+        # print("\nPushing new commit to remote repository.")
+        # common.push(args.repository)
 
     def __list(self, args):
         raise NotImplementedError

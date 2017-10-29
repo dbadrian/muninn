@@ -32,6 +32,10 @@ class PackageManager():
         self.is_initialized = self.__load_local_database()
         self.__scan_repository()
 
+    def load_packages(self, packages, version="latest"):
+        for pkg_name in packages:
+            self.pkgs[pkg_name].load_module(version=version)
+
     def load_and_resolve_dependencies(self, desired_pkgs):
         # check if desired packages exist
         filtered_pkgs = [pkg_blob for pkg_blob in desired_pkgs if
@@ -45,6 +49,7 @@ class PackageManager():
             logger.info(
                 "Following packages do not exit and will be skipped: \n%s", msg)
 
+        # Initial mapping from name -> desired version
         pkg2ver = {name: version for name, version in filtered_pkgs}
 
         # now load all desired modules in desired version

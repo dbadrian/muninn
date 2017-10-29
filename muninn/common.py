@@ -16,6 +16,7 @@
 
 import contextlib
 import errno
+import glob
 import inspect
 import json
 import logging
@@ -26,6 +27,7 @@ import shutil
 import subprocess
 import tempfile
 import types
+from subprocess import call
 
 try:
     from shutil import which
@@ -62,6 +64,16 @@ def copy_func(f, name=None):
 
 
 # OS/Path-related stuff
+def glob_files(base_path, relative_targets):
+    fn_queue = []
+    for target in relative_targets:
+        path_origin = os.path.join(base_path, target)
+        # process unix style wildcards
+        for file in glob.glob(path_origin):
+            fn_queue.append(file.rsplit("/", 1)[1])
+    return fn_queue
+
+
 def get_current_module_folder():
     frame = inspect.stack()[1]
     module = inspect.getmodule(frame[0])
@@ -115,6 +127,16 @@ def tempdir():
 
 
 # Text Processing
+def get_non_comment_lines(text):
+    pure_text = []
+    for line in text.split('\n'):
+        li = line.strip()
+        if not li.startswith("#"):
+            pure_text.append(line.rstrip())
+    # return result without any empty lines
+    return [line for line in pure_text if line]
+
+
 def extract_value_from_tags(text_input,
                             opening_tag="<!s>",
                             closing_tag="</!s>"):
@@ -142,9 +164,52 @@ def get_params(fn_sample):
 
 
 # Git Interaction
-def get_changed_files(repo):
-    # requires gitpython
-    return [item.a_path for item in repo.index.diff(None)]
+try:
+    from git import Repo
+
+
+    def get_changed_files(repo_path):
+        repo = Repo(repo_path)
+        return [item.a_path for item in repo.index.diff(None)]
+
+
+    def get_untracked_files(repo_path):
+        repo = Repo(repo_path)
+        return repo.untracked_files
+
+
+    def stage_files(repo_path, relative_file_paths):
+        repo = Repo(repo_path)
+        abs_file_paths = [os.path.join(repo.working_tree_dir, p) for p in
+                          relative_file_paths]
+        for file in abs_file_paths:
+            if os.path.isfile(file):
+                repo.index.add([file])
+            else:
+                repo.index.remove([file])
+
+
+    def unstage_files(repo_path, relative_file_paths):
+        repo = Repo(repo_path)
+        repo.index.reset(commit="HEAD", paths=relative_file_paths)
+
+
+    def push(repo_path, local_branch="master", remote="origin"):
+        repo = Repo(repo_path)
+        return repo.git.push(remote, local_branch)
+
+    def commit(repo_path, message):
+        repo = Repo(repo_path)
+        repo.git.commit(m=message)
+
+
+except ModuleNotFoundError:
+    def get_changed_files(repo):
+        raise NotImplementedError
+
+
+    def get_untracked_files(repo_path):
+        raise NotImplementedError
 
 
 def get_latest_commit(path):
@@ -188,10 +253,26 @@ def run_linux_cmd(cmd, stdout=True, cwd=None, shell=False):
 
 # useful python snippets
 def yes_or_no(question):
-    reply = str(input(question+' (y/n): ')).lower().strip()
+    reply = str(input(question + ' (y/n): ')).lower().strip()
     if reply[0] == 'y':
         return True
     if reply[0] == 'n':
         return False
     else:
         return yes_or_no("Uhhhh... please enter a correct one...")
+
+
+def message_from_sys_editor(initial_message=""):
+    EDITOR = os.environ.get('EDITOR', 'nano')  # that easy!
+
+    initial_message = initial_message.encode('utf-8')
+
+    with tempfile.NamedTemporaryFile(suffix=".tmp") as tf:
+        tf.write(initial_message)
+        tf.flush()
+        call([EDITOR, tf.name])
+
+        # do the parsing with `tf` using regular File operations.
+        # for instance:
+        tf.seek(0)
+        return tf.read().decode('utf-8')
