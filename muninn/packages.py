@@ -156,6 +156,27 @@ class Package(object):
         content = common.get_file_at_commit(muninn_pkg_file, commit)
         return self.__extract_version_number(content)
 
+    def extract_version_number(self):
+        path = os.path.join(self.path, self.pkg_name + "_muninn.py")
+
+        with open(path, 'r') as pkg_data:
+            pkg_text = pkg_data.read()
+            return self.__extract_version_number(pkg_text)
+
+    def bump_version_number(self, major=False, minor=False, patch=False):
+        path = os.path.join(self.path, self.pkg_name + "_muninn.py")
+        with open(path, 'r') as pkg_data:
+            pkg_text = pkg_data.read()
+            current_version = self.__extract_version_number(pkg_text)
+            bumped_version = common.bump_version(current_version, major, minor,
+                                                 patch)
+
+            pkg_text = re.sub(r'("version":\s*")([\d.]+)',
+                              "\\g<1>" + bumped_version, pkg_text)
+
+        with open(path, 'w') as pkg_data:
+            pkg_data.write(pkg_text)
+
     def __extract_version_number(self, file_content):
         res = re.search('"version":\s*"([\d.]+)"', file_content)
         if res:

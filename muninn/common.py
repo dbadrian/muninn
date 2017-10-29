@@ -198,6 +198,7 @@ try:
         repo = Repo(repo_path)
         return repo.git.push(remote, local_branch)
 
+
     def commit(repo_path, message):
         repo = Repo(repo_path)
         repo.git.commit(m=message)
@@ -249,6 +250,15 @@ def run_linux_cmd(cmd, stdout=True, cwd=None, shell=False):
                               shell=shell)
     else:
         return subprocess.run(cmd.split(), cwd=cwd, shell=shell)
+
+
+# muninn
+def bump_version(version, major=False, minor=False, patch=True):
+    ma, mi, pa = map(int, version.split('.'))
+    if major: ma += 1
+    if minor: mi += 1
+    if patch: pa += 1
+    return '.'.join([str(ma), str(mi), str(pa)])
 
 
 # useful python snippets

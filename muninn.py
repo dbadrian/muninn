@@ -230,14 +230,25 @@ class Muninn(object):
         for file in files_to_stage:
             print("    ", file)
 
+        # simulate version bumps
+        pkg2bumpedversion = {}
+        for pkg in changed_pkgs:
+            v = pm.pkgs[pkg].extract_version_number()
+            pkg2bumpedversion[pkg] = (v, common.bump_version(v, patch=True))
+
         print("\nIncrementing package versions as following:")
         for pkg in changed_pkgs:
-            print("    ", pkg, ": old version ==> new version")
+            msg = "    {}: ({}) ==> ({})".format(pkg, *pkg2bumpedversion[pkg])
+            print(msg)
 
         if not common.yes_or_no("\nCommit the changes above?"):
             exit(0)
 
-        # do a version bump and remember changes
+        # Bump versions
+        pm.pkgs[pkg].bump_version_number(False, False, True)
+
+
+        # TODO: regenerate repository readme
 
         # # git add those files
         # common.stage_files(args.repository, files_to_stage)

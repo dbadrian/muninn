@@ -46,7 +46,7 @@ def main():
     pkg_table = generate_supported_pkgs_string()
 
 
-    with open("muninn/README.md.tpl", 'r') as f_sample:
+    with open("templates/muninn_readme.tpl", 'r') as f_sample:
         readme_txt = f_sample.read()
         readme_txt = common.replace_tags(readme_txt, "SUPPORTED_PACKAGES_PLACEHOLDER", pkg_table)
 
