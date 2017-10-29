@@ -1,9 +1,0 @@
-# Add all config folders which are ready to be synced explicitly here for now...
-!zsh/
-!st3/
-!user_bin/
-!terminator/
-!zotero/
-!system_setup/
-!archpackages
-!tensorflow/

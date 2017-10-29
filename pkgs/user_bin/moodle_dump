@@ -1,4 +1,0 @@
-#!/bin/zsh
-cd /home/dadrian/git/tum_moodle_scraper
-source activate moodle_scraper
-python scraper.py --fn_out ~/workspace/02_kalpvruksh/01_university/01_ei/00_moodle_dump --user ga56tit --semester 2017-1

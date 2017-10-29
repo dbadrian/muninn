@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# check is restic rest server is running, and start if necessary
-ssh admin@empyreum <<'ENDSSH'
-if ! screen -list | grep -q "restserver"; then
-	echo " # Starting Restic Rest-Server"
-	/share/work_dir/scripts/start_restic_server.bash
-fi
-ENDSSH
