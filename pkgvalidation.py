@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 class InvalidMuninnPackage(Exception):
     pass
 
+
 class MuninnPackageBlueprint():
     required = [
         ("name", str),
@@ -41,6 +42,7 @@ class MuninnPackageBlueprint():
         ("conflicts", list, str),
         ("symlink_targets", list, tuple),
     ]
+
 
 def MuninnPackage(package_class):
     # now check if types are correct
@@ -71,7 +73,7 @@ def MuninnPackage(package_class):
                     assert all(isinstance(item, optional[2]) for item in
                                getattr(package_class, optional[
                                    0])), "Not all elements of list %s are of required type %s" % (
-                    optional[0], optional[2])
+                        optional[0], optional[2])
 
         # pass all asserts, add attribute for valid package
         package_class.__valid_muninn_pkg = True
@@ -97,19 +99,27 @@ class ZSH():
     depends_muninn = ["system_setup"]
     conflicts = []
     symlink_targets = [
-                       (".zsh", "~/"),
-                       ]
-
+        (".zsh", "~/"),
+    ]
 
 
 def main():
-    try:
-        pkg = ZSH()
-        print(getattr(pkg, '__valid_muninn_pkg'))
-        # validate_package(ZSH)
-        # print(inspect.getsource(packages.MuninnPackage))
-    except TypeError as e:
-        print(e)
+    import pkgutil
+    import inspect
+    import repository
+    for (module_loader, name, ispkg) in pkgutil.iter_modules(repository.__path__):
+
+        loader, path = module_loader.find_loader(name)
+        a = loader.load_module()
+        clsmembers = inspect.getmembers(a, inspect.isclass)
+        print(clsmembers)
+        # try:
+            #     pkg = ZSH()
+            #     print(getattr(pkg, '__valid_muninn_pkg'))
+            #     # validate_package(ZSH)
+            #     # print(inspect.getsource(packages.MuninnPackage))
+            # except TypeError as e:
+            #     print(e)
 
 
 if __name__ == '__main__':
