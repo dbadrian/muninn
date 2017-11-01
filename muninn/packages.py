@@ -19,6 +19,7 @@ import os
 import re
 import sys
 from importlib import import_module, reload
+from abc import abstractmethod, abstractproperty, ABCMeta
 
 import muninn.common as common
 
