@@ -25,6 +25,66 @@ import muninn.common as common
 
 logger = logging.getLogger(__name__)
 
+class InvalidMuninnPackage(Exception):
+    pass
+
+
+class MuninnPackageBlueprint():
+    required = [
+        ("name", str),
+        ("description", str),
+        ("version", str),
+    ]
+
+    optional = [
+        ("depends_arch", list, str),
+        ("depends_muninn", list, str),
+        ("conflicts", list, str),
+        ("symlink_targets", list, tuple),
+    ]
+
+
+def MuninnPackage(package_class):
+    # now check if types are correct
+    blueprint = MuninnPackageBlueprint()
+
+    try:
+        for required in blueprint.required:
+            assert hasattr(package_class, required[0])
+            assert type(getattr(package_class, required[0])) == required[
+                1], "Type of .%s should be %s, but is %s" % (required[0],
+                                                             required[1], type(
+                getattr(package_class, required[0])))
+
+            if type(getattr(package_class, required[0])) == list:
+                assert all(isinstance(item, required[2]) for item in
+                           getattr(package_class, required[
+                               0])), "Not all elements of list %s are of required type %s" % (
+                    required[0], required[2])
+
+        for optional in blueprint.optional:
+            if hasattr(package_class, optional[0]):
+                assert type(getattr(package_class, optional[0])) == optional[
+                    1], "Type of optional .%s should be %s, but is %s" % (
+                    optional[0], optional[1],
+                    type(getattr(package_class, optional[0])))
+
+                if type(getattr(package_class, optional[0])) == list:
+                    assert all(isinstance(item, optional[2]) for item in
+                               getattr(package_class, optional[
+                                   0])), "Not all elements of list %s are of required type %s" % (
+                        optional[0], optional[2])
+
+        # pass all asserts, add attribute for valid package
+        package_class.__valid_muninn_pkg = True
+    except AssertionError as e:
+        logger.debug(e)
+        # didnt all asserts, add attribute for valid package
+        package_class.__valid_muninn_pkg = False
+        raise InvalidMuninnPackage(e)
+
+    return package_class
+
 
 class Package(object):
     """
