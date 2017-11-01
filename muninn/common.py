@@ -261,12 +261,12 @@ def bump_version(version, major=False, minor=False, patch=True):
     return '.'.join([str(ma), str(mi), str(pa)])
 
 def make_pkg_string(pkg):
-# [(pkg.info["name"], pkg.info["desc"], False)
+# [(pkg.info["name"], pkg.info["description"], False)
 #                for pkg in pkgs.values()]
     pkg_deps = " ".join(pkg.info["depends"]["muninn"]) if pkg.info["depends"]["muninn"] else "*None*"
     base_pkg_string = str(pkg.info["name"]) + " | " \
                      + str(pkg.info["version"])  +" | " \
-                     + str(pkg.info["desc"]) + " | " \
+                     + str(pkg.info["description"]) + " | " \
                      + pkg_deps + "\n"
     return base_pkg_string
 
