@@ -27,7 +27,7 @@ MUNINN_INSTALL_FOLDER=$HOME/git/muninn
 GITHUB_USERNAME="dbadrian"
 GITHUB_KEY_NAME="laptop"
 
-CONDA_VERSION="5.0.0.1"
+CONDA_VERSION="5.2.0"
 
 ############## DO NOT MODIFY BELOW THIS LINE ###########
 # This does not resolve from a symlink location
@@ -63,7 +63,7 @@ setup_sshkey_github() {
 }
 
 install_conda() {
-    wget https://repo.continuum.io/archive/Anaconda3-${1}-Linux-x86_64.sh -P /tmp
+    wget https://repo.anaconda.com/archive/Anaconda3-${1}-Linux-x86_64.sh -P /tmp
     bash /tmp/Anaconda3-${1}-Linux-x86_64.sh -b -p $HOME/anaconda3
     export PATH="$HOME/anaconda3/bin:$PATH"
 }

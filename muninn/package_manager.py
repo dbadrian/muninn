@@ -155,15 +155,3 @@ class PackageManager():
                 json.dump(self.database, db_file, indent=4)
         else:
             logger.debug("Database not initialized, not saving it!")
-
-    def __scan_repository(self):
-        # Search for packages
-        pkg_paths = packages.search_packages(self.pkg_dir)
-
-        # Load pkgs
-        self.pkgs = {name: packages.Package(name, path) for (name, path) in
-                     pkg_paths.items()}
-
-        # Filter out invalid muninn pkgs
-        # self.pkgs = {name: pkg for (name, pkg) in pkgs.items() if pkg.valid}
-        # logger.debug("Valid muninn pkgs found: {}".format(self.pkgs))

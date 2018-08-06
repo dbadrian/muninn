@@ -19,7 +19,6 @@ import os
 import re
 import sys
 from importlib import import_module, reload
-from abc import abstractmethod, abstractproperty, ABCMeta
 
 import muninn.common as common
 
@@ -32,11 +31,10 @@ class InvalidMuninnPackage(Exception):
 class MuninnPackageBlueprint():
     required = [
         ("name", str),
-        ("description", str),
-        ("version", str),
     ]
 
     optional = [
+        ("description", str),
         ("depends_arch", list, str),
         ("depends_muninn", list, str),
         ("conflicts", list, str),
@@ -48,34 +46,25 @@ def MuninnPackage(package_class):
     # now check if types are correct
     blueprint = MuninnPackageBlueprint()
 
+    def check_for_attribute(cls, attribute_def, required=False):
+        attribute_set = hasattr(cls, attribute_def[0])
+        if required and not attribute_set:
+            assert , "Required attribute < {} > not set".format(attribute_def[0])
+
+        if attribute_set:
+            assert type(getattr(cls, attribute_def[0])) == attribute_def[1], "Type of attribute {} should be {}, but is {}".format(attribute_def[0], attribute_def[1], type(getattr(cls, attribute_def[0])))
+
+            if type(getattr(cls, attribute_def[0])) == list:
+                assert all(isinstance(item, attribute_def[2]) for item in getattr(cls, attribute_def[0])), "Not all elements of list %s are of type %s" % (attribute_def[0], attribute_def[2])
+
     try:
         for required in blueprint.required:
-            assert hasattr(package_class, required[0])
-            assert type(getattr(package_class, required[0])) == required[
-                1], "Type of .%s should be %s, but is %s" % (required[0],
-                                                             required[1], type(
-                getattr(package_class, required[0])))
-
-            if type(getattr(package_class, required[0])) == list:
-                assert all(isinstance(item, required[2]) for item in
-                           getattr(package_class, required[
-                               0])), "Not all elements of list %s are of required type %s" % (
-                    required[0], required[2])
+            check_for_attribute(package_class, required, required=True)
 
         for optional in blueprint.optional:
-            if hasattr(package_class, optional[0]):
-                assert type(getattr(package_class, optional[0])) == optional[
-                    1], "Type of optional .%s should be %s, but is %s" % (
-                    optional[0], optional[1],
-                    type(getattr(package_class, optional[0])))
+            check_for_attribute(package_class, optional, required=False)
 
-                if type(getattr(package_class, optional[0])) == list:
-                    assert all(isinstance(item, optional[2]) for item in
-                               getattr(package_class, optional[
-                                   0])), "Not all elements of list %s are of required type %s" % (
-                        optional[0], optional[2])
-
-        # pass all asserts, add attribute for valid package
+        # pass all asserts, then attribute for valid package
         package_class.__valid_muninn_pkg = True
     except AssertionError as e:
         logger.debug(e)
@@ -248,31 +237,3 @@ class Package(object):
     def __load_hash(self, file_path, hash, output_path):
         pass
 
-
-def search_packages(pkgs_path):
-    """
-    @brief      Searches a folder for Muninn-packages (containg
-                name.munnin.py file)
-
-    @param      pkgs_path  Path to search folder
-
-    @return     List of Munnin-packges
-    """
-    if not os.path.exists(pkgs_path):
-        logger.error("%s does not exist. Search terminated.", pkgs_path)
-        return None
-    else:
-        logger.info("Searching packages in: %s", pkgs_path)
-
-        # just aggregate all potential pkgs
-        pkg_candidates = common.get_immediate_subdirectories(pkgs_path)
-        logger.debug("Package Candidates %s", pkg_candidates)
-
-        # check if they contain a muninn pkg declaration (no validation!)
-        packages = {pkg_candidate: os.path.join(pkgs_path, pkg_candidate)
-                    for pkg_candidate in pkg_candidates if os.path.exists(
-            os.path.join(pkgs_path, pkg_candidate,
-                         pkg_candidate + "_muninn.py"))}
-
-        logger.info("Found %i packages: %s", len(packages), packages)
-        return packages
