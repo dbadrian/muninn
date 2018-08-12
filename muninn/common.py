@@ -212,29 +212,30 @@ def get_params(fn_sample):
 
 # Git Interaction
 try:
-    from git import Repo
-
-
-    def get_changed_files(repo_path):
-        repo = Repo(repo_path)
+    def get_changed_files(repo):
         return [item.a_path for item in repo.index.diff(None)]
 
 
-    def get_untracked_files(repo_path):
-        repo = Repo(repo_path)
+    def get_untracked_files(repo):
         return repo.untracked_files
 
 
-    def stage_files(repo_path, relative_file_paths):
-        repo = Repo(repo_path)
-        abs_file_paths = [os.path.join(repo.working_tree_dir, p) for p in
-                          relative_file_paths]
-        for file in abs_file_paths:
-            if os.path.isfile(file):
+    def stage_files_absolute(repo, absolute_file_paths):
+        if type(absolute_file_paths) == list:
+            for file in absolute_file_paths:
                 repo.index.add([file])
-            else:
-                repo.index.remove([file])
+        else:
+            repo.index.add([absolute_file_paths])
 
+
+    # def stage_files_relative(repo, relative_file_paths):
+    #     abs_file_paths = [os.path.join(repo.working_tree_dir, p) for p in
+    #                       relative_file_paths]
+    #     for file in abs_file_paths:
+    #         repo.index.add([file])
+
+    def get_absolute_paths(repo, relative_file_paths):
+        return [os.path.join(repo.working_tree_dir, p) for p in relative_file_paths]
 
     def unstage_files(repo_path, relative_file_paths):
         repo = Repo(repo_path)
@@ -246,9 +247,13 @@ try:
         return repo.git.push(remote, local_branch)
 
 
-    def commit(repo_path, message):
-        repo = Repo(repo_path)
+    def commit(repo, message):
         repo.git.commit(m=message)
+
+
+    def stage_and_commit_files(repo, abs_file_paths, message):
+        stage_files_absolute(repo, abs_file_paths)
+        commit(repo, message)
 
 
 except ModuleNotFoundError:
@@ -351,3 +356,7 @@ def message_from_sys_editor(initial_message=""):
         # for instance:
         tf.seek(0)
         return tf.read().decode('utf-8')
+
+def muninn_module_path():
+    path = os.path.abspath(__file__)
+    return os.path.dirname(path)

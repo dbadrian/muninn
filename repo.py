@@ -19,7 +19,7 @@ import logging
 
 import muninn.common as common
 
-import muninn.packages as packages
+import muninn.repository as repo
 
 common.setup_logging(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -27,26 +27,15 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    import pkgutil
-    import inspect
-    import repository
-    for (module_loader, name, ispkg) in pkgutil.iter_modules(repository.__path__):
+    rp = repo.Repository("/tmp/muninn_repo")
+    # rp.initialize_repository()
+    # rp.start_tracking_package("zsh")
+    # rp.update_package("zsh")
 
-        loader, path = module_loader.find_loader(name)
-        try:
-            a = loader.load_module()
-            clsmembers = inspect.getmembers(a, inspect.isclass)
-            print(clsmembers[0][1]().description)
-        except packages.InvalidMuninnPackage as e:
-            print(e)
-        # try:
-            #     pkg = ZSH()
-            #     print(getattr(pkg, '__valid_muninn_pkg'))
-            #     # validate_package(ZSH)
-            #     # print(inspect.getsource(packages.MuninnPackage))
-            # except TypeError as e:
-            #     print(e)
+    # print(rp.get_package_revisions("zsh"))
+    # print(rp.current_package_revision("zsh"))
 
+    rp.list_untracked_packages()
 
 if __name__ == '__main__':
     main()

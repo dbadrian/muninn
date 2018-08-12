@@ -4,7 +4,7 @@ import logging
 import os
 
 import muninn.common as common
-import muninn.packages as packages
+import muninn.package as packages
 
 common.setup_logging(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

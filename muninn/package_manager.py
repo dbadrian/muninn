@@ -20,7 +20,7 @@ import os
 
 import muninn.builder as builder
 import muninn.depresolver as depresolver
-import muninn.packages as packages
+import muninn.package as packages
 
 logger = logging.getLogger(__name__)
 
