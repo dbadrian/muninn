@@ -29,13 +29,19 @@ logger = logging.getLogger(__name__)
 def main():
     rp = repo.Repository("/tmp/muninn_repo")
     # rp.initialize_repository()
+    # rp.add_empty_package("zsh")
     # rp.start_tracking_package("zsh")
     # rp.update_package("zsh")
 
     # print(rp.get_package_revisions("zsh"))
     # print(rp.current_package_revision("zsh"))
 
-    rp.list_untracked_packages()
+    # rp.list_untracked_packages()
+
+    # print(common.git_file_choose_dialog(*rp.check_package_status("zsh")))
+    # rp.start_tracking_package("zsh")
+    # rp.update_package("zsh")
+
 
 if __name__ == '__main__':
     main()

@@ -15,6 +15,7 @@
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import contextlib
+import datetime
 import errno
 import glob
 import inspect
@@ -26,6 +27,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+import time
 import types
 from subprocess import call
 
@@ -210,7 +212,29 @@ def get_params(fn_sample):
             return extract_value_from_tags(d_sample)
 
 
-# Git Interaction
+def git_file_choose_dialog(changed_files, untracked_files):
+    # generate text with grouping by packages and list modified and untracked
+    # files. everything without a hashtag will be added to comming up commit.
+    pkg_msg = "# modified / deleted files:\n" \
+              "{}\n" \
+              "# untracked files:\n" \
+              "{}\n\n"
+
+    msg = "############################################################\n" \
+          "# Please confirm the changes that will be recorded in the \n" \
+          "# commit. Lines starting with '#' will be ignored.\n" \
+          "############################################################\n\n"
+
+    s_changed = "\n".join([file for file in changed_files])
+    s_untracked = "\n".join([file for file in untracked_files])
+
+    msg += pkg_msg.format(s_changed, s_untracked)
+
+    ret = message_from_sys_editor(msg)
+    files_to_stage = get_non_comment_lines(ret)
+
+    return files_to_stage
+
 try:
     def get_changed_files(repo):
         return [item.a_path for item in repo.index.diff(None)]
@@ -360,3 +384,7 @@ def message_from_sys_editor(initial_message=""):
 def muninn_module_path():
     path = os.path.abspath(__file__)
     return os.path.dirname(path)
+
+
+def timestamp():
+    return datetime.datetime.fromtimestamp(time.time()).strftime('%y%m%d-%H%M%S')
