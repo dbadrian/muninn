@@ -41,7 +41,7 @@ def main():
     # print(common.git_file_choose_dialog(*rp.check_package_status("zsh")))
     # rp.start_tracking_package("zsh")
     # rp.update_package("zsh")
-
+    rp.rollback_package("zsh", "180817-230529")
 
 if __name__ == '__main__':
     main()

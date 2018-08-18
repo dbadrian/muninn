@@ -18,6 +18,7 @@ import json
 import logging
 import os
 import shutil
+import io
 from pathlib import Path
 
 from git import Repo
@@ -40,7 +41,6 @@ class Repository():
         except InvalidGitRepositoryError:
             logger.error("Repository could not be loaded. Already initialized?")
             self.initialized = False
-
 
     ############################################################################
     ################### PACKAGE MANAGEMENT #####################################
@@ -82,7 +82,7 @@ class Repository():
         # checkout procedure
 
         # If module is already at the correct version, do nothing
-        current_pkg_rev = self.current_package_revision()
+        current_pkg_rev = self.current_package_revision(name)
         if desired_version == current_pkg_rev:
             logger.debug(
                 "Current Package version is the same as desired. Aborting.")
@@ -94,6 +94,7 @@ class Repository():
 
             if changed_files or untracked_files:
                 logger.info("Package not clean. Take action")
+                self.__commit_package(name, "{}: Update".format(name))
                 # stash
                 # commit
                 # drop
@@ -111,7 +112,19 @@ class Repository():
         # 5. delete $tempdir
         # 6. git commit --allow-empty the package
         # `````````````````````````````````````````````````````
-        pass
+        with common.tempdir() as tdir:
+            # Restore the path at the given tag
+            tag = "{}/{}".format(name, desired_version)
+            common.restore_path_at_tag(self.repo, tag, name, tdir)
+
+            # Delete the current folder & and recreate since its easier...
+            pkg_path = self.path.joinpath(name)
+            shutil.rmtree(pkg_path)
+
+            # Copy the restored folder
+            shutil.copytree(Path(tdir), pkg_path)
+
+            self.__commit_package(name, "{}: Rollback to {}".format(name, desired_version))
 
     def current_package_revision(self, name):
         return self.get_package_revisions(name)[-1]
@@ -138,7 +151,7 @@ class Repository():
         untracked_files = common.get_untracked_files(self.repo)
 
         if name:
-            changed_files = [file for file in changed_files if
+            changed_files = [(file, ctype) for file, ctype in changed_files if
                              file.split(os.sep)[0] == name]
             untracked_files = [file for file in untracked_files if
                                file.split(os.sep)[0] == name]
@@ -146,9 +159,11 @@ class Repository():
         return changed_files, untracked_files
 
     def __commit_package(self, pkg_name, message, file_selector=True):
-        p_pkg = str(self.path.joinpath(pkg_name))
         files = common.git_file_choose_dialog(
-            *self.check_package_status(pkg_name)) if file_selector else [p_pkg]
+            *self.check_package_status(pkg_name)) if file_selector else [pkg_name]
+
+        files = [str(self.path.joinpath(file)) for file in files]
+
         if files:
             common.stage_and_commit_files(self.repo, files, message)
             self.repo.create_tag("{}/{}".format(pkg_name, common.timestamp()))
