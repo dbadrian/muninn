@@ -17,141 +17,85 @@
 import json
 import logging
 import os
+from pathlib import Path
 
-import muninn.builder as builder
-import muninn.depresolver as depresolver
+import muninn.repository as repo
 import muninn.package as packages
+import muninn.exceptions as exc
+import muninn.fs as fs
+
+
 
 logger = logging.getLogger(__name__)
 
 
 class PackageManager():
-    def __init__(self, pkg_dir):
-        self.pkg_dir = os.path.abspath(pkg_dir)
-        self.__scan_repository()
-        self.database_path = os.path.join(self.pkg_dir, ".database.json")
-        self.is_initialized = self.__load_local_database()
-
-    def load_packages(self, packages, version="latest"):
-        for pkg_name in packages:
-            self.pkgs[pkg_name].load_module(version=version)
-
-    def load_and_resolve_dependencies(self, desired_pkgs):
-        # check if desired packages exist
-        filtered_pkgs = [pkg_blob for pkg_blob in desired_pkgs if
-                         pkg_blob[0] in self.pkgs]
-        dropped_pkgs = set(desired_pkgs).difference(set(filtered_pkgs))
-        if dropped_pkgs:
-            msg = ''.join(
-                ["    " + str(idx) + ": " + pkg_name + "\n" for
-                 idx, (pkg_name, _) in
-                 enumerate(dropped_pkgs)])
-            logger.info(
-                "Following packages do not exit and will be skipped: \n%s", msg)
-
-        # Initial mapping from name -> desired version
-        pkg2ver = {name: version for name, version in filtered_pkgs}
-
-        # now load all desired modules in desired version
-        for pkg_name, version in filtered_pkgs:
-            logger.debug("Loading module: %s", pkg_name)
-            self.pkgs[pkg_name].load_module(version=version)
-
-        depends_graph, removed_pkgs = depresolver.build_graph(
-            [n for n, v in filtered_pkgs], self.pkgs)
-        install_order = depresolver.resolve_graph(depends_graph)
-
-        # Update pkg2ver with newly added dependencies without overwriting "latest"
-        pkg2ver.update(
-            {self.pkgs[name].info["name"]: self.pkgs[name].info["version"] for
-             name, version in self.pkgs.items() if
-             hasattr(self.pkgs[name], "info") and not name in pkg2ver})
-
-        # "zip" install order of pkgs with respective desired version
-        install_order_with_version = [(pkg, pkg2ver[pkg]) for pkg in
-                                      install_order]
-
-        return install_order_with_version, removed_pkgs
-
-    def filter_install_order(self, install_order):
-        logger.debug(
-            "Filtering packages by: 'already installed' and 'up2date'")
-
-        # Filter by not installed yet
-        not_installed = [(pkg, version) for pkg, version in install_order if
-                         pkg not in self.database["installed"]]
-
-        incorrect_version = [(pkg, version) for pkg, version in
-                             install_order if
-                             pkg in self.database["installed"] and
-                             self.database["installed"][pkg] != version]
-
-        return not_installed, incorrect_version
-
-    def install_packages(self, install_order):
-        logger.info(
-            "Following packages (and required dependencies will be installed: "
-            "%s",
-            install_order)
-
-        for idx, (pkg_name, version) in enumerate(install_order):
-            if builder.install(self.pkgs[pkg_name]):
-                self.database["installed"][pkg_name] = version
-            else:
-                return 1  # Failed installing a package. Abort!
-
-        self.__save_local_database()
-        return 0  # Successfully installed all packages
-
-    def initialize_new_database(self, overwrite=False):
-        if os.path.isfile(self.database_path):
-            logger.debug("Database already exists.")
-            if overwrite:
-                logger.debug("Overwriting database!")
-            else:
-                return False
-
-        self.database = {
-            "installed": {}
-        }
-
-        with open(self.database_path, 'w') as db_file:
-            logger.debug("Creating empty database at %s.", self.database_path)
-            json.dump(self.database, db_file, indent=4)
-
-        self.is_initialized = True
-        return True
-
-    def installed_package_version(self, pkg_name):
-        try:
-            return self.database["installed"][pkg_name]
-        except:
-            return ["not installed"]
-
-    def load_all_modules(self, reload=True):
-        if reload:
-            logger.debug("Deleting pkgs dict and rescan repository.")
-            self.pkgs.clear()
-            self.__scan_repository()
-
-        for name, pkg in self.pkgs.items():
-            pkg.load_module(version="latest")
-
-    def __load_local_database(self):
-        logger.debug("Loading package database from %s", self.database_path)
-        try:
-            with open(self.database_path, 'r') as db_file:
-                self.database = json.load(db_file)
-            return True
-        except FileNotFoundError:
-            logger.debug("Couldn't find package database. %s not initialized!",
-                         self.__class__.__name__)
-            return self.initialize_new_database()
-
-    def __save_local_database(self):
-        if self.is_initialized:
-            logger.debug("Saving database at %s", self.database_path)
-            with open(self.database_path, 'w') as db_file:
-                json.dump(self.database, db_file, indent=4)
+    def __init__(self, package_manager_db_path=None):
+        if package_manager_db_path:
+            self.path = Path(package_manager_db_path).expanduser()
+        elif os.environ.get('MUNINN_DB'):
+            self.path = Path(os.environ.get('MUNINN_DB')).expanduser()
         else:
-            logger.debug("Database not initialized, not saving it!")
+            logger.error("No path to muninn db path defined. Set environment variable MUNINN_DB or give explicitly.")
+            raise exc.PackageManagerInvalidDBPath
+
+
+        if self.path.exists():
+            self.__load_db()
+        else:
+            self.initialized = False
+            logger.error("Path to packager manager db not found! Is it initalized?")
+            raise exc.PackageManagerDBNotFound
+
+    def initialize(self, repo_path):
+        if self.path.exists():
+            logger.error("Package Manager DB seems to already exits. Aborting initialization.")
+            raise exc.PackageManagerDBAlreadyExists
+
+        self.path.mkdir()
+        db = {
+            "repository_path": repo_path
+        }
+        with open(self.path, "w") as f:
+            json.dump(db, f, indent=4)
+
+    def __load_db(self):
+        with open(self.path, "r") as f:
+            self.db = json.load(f)
+        self.initialized = True
+
+    def __load_packages(self):
+        # Search for packages
+        pkg_candidates = self.__search_package_candidates()
+
+        # Load pkgs
+        pkgs = {name: packages.load_package(path, name) for (name, path) in
+                pkg_candidates.items()}
+
+        # Filter out invalid muninn pkgs
+        self.pkgs = {name: pkg for (name, pkg) in pkgs.items() if pkg().valid}
+        logger.debug("Valid muninn pkgs found: {}".format(self.pkgs.keys()))
+
+        self.invalid_pkgs = {name for name, pkg in pkgs.items() if
+                             not pkg().valid}
+        logger.debug("Invalid muninn pkgs found: {}".format(self.pkgs))
+
+
+    def __search_package_candidates(self):
+        logger.debug(
+            "Scanning repository for packages in: '{}'".format(str(self.path)))
+
+        # Aggregate potential packages by finding all subdirectories in repository
+        pkg_candidates = fs.get_immediate_subdirectories(self.path)
+        logger.debug("Package Candidates %s", pkg_candidates)
+
+        # Check if they contain a python file of same name
+        packages = {pkg_candidate: os.path.join(self.path, pkg_candidate) for
+                    pkg_candidate in pkg_candidates if os.path.exists(
+            os.path.join(self.path, pkg_candidate, pkg_candidate + ".py"))}
+
+        logger.info("Found %i packages: %s", len(packages), packages)
+        return packages
+
+    def __write_database(self):
+        pass

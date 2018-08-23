@@ -18,38 +18,49 @@ import json
 import logging
 import os
 import shutil
-import io
 from pathlib import Path
 
 from git import Repo
-from git.exc import InvalidGitRepositoryError
+from git.exc import InvalidGitRepositoryError, GitCommandError
 
 import muninn.common as common
-import muninn.package as packages
+import muninn.fs
+import muninn.git
+import muninn.exceptions as exc
 
 logger = logging.getLogger(__name__)
 
 
 class Repository():
-    def __init__(self, repository_path):
-        self.path = Path(repository_path).expanduser()
+    def __init__(self, repository_path=None):
+
+        if repository_path:
+            self.path = Path(repository_path)
+        elif os.environ.get('MUNINN_REPOSITORY'):
+            self.path = Path(os.environ.get('MUNINN_REPOSITORY')).expanduser()
+        else:
+            logger.error("No path to muninn repository defined. Set environment variable MUNINN_DB or give explicitly.")
+            raise exc.RepositoryInvalidDBPath
 
         try:
-            self.repo = Repo(str(self.path))
-            logger.debug("Repository loaded.")
-            self.initialized = True
-        except InvalidGitRepositoryError:
+            if self.path.exists():
+                self.repo = Repo(str(self.path))
+                logger.debug("Repository loaded.")
+                self.initialized = True
+            else:
+                raise Exception
+        except:
             logger.error("Repository could not be loaded. Already initialized?")
             self.initialized = False
 
     ############################################################################
-    ################### PACKAGE MANAGEMENT #####################################
+    ################### PACKAGE MAINTANCE ######################################
     ############################################################################
 
     def add_empty_package(self, name):
         """
         Creates an "empty" package, which does nothing, but has all the
-        import base files and subfolders. Returns true on success.
+        import base files and sub-folders. Returns true on success.
         Will not be tracked yet! Needs to be marked for release first.
         """
         pkgpath = self.path.joinpath(name)
@@ -68,19 +79,15 @@ class Repository():
         return True
 
     def start_tracking_package(self, name):
-        if not name in self.get_tracked_packages(name):
-            self.__commit_package(name, "{}: Tracking Activated".format(name))
+        if not name in self.get_tracked_packages():
+            return self.__commit_package(name, "{}: Tracking Activated".format(name))
         else:
             logger.debug("Package {} already being tracked.".format(name))
 
     def update_package(self, name):
-        self.__commit_package(name, "{}: Update".format(name))
+        return self.__commit_package(name, "{}: Update".format(name))
 
     def rollback_package(self, name, desired_version):
-        # SHOULD ONLY BE RUN IF THE PACKAGE IS NOT INSTALLED!
-        # verify if package is clean, if not: update package
-        # checkout procedure
-
         # If module is already at the correct version, do nothing
         current_pkg_rev = self.current_package_revision(name)
         if desired_version == current_pkg_rev:
@@ -88,34 +95,16 @@ class Repository():
                 "Current Package version is the same as desired. Aborting.")
             return True
 
-        # As long as there are unchanged files, user needs to resolve
-        while True:
-            changed_files, untracked_files = self.check_package_status(name)
+        changed_files, untracked_files = self.check_package_status(name)
+        if changed_files or untracked_files:
+            logger.error(
+                "Package status is not clean (uncommitted or untracked files). Resolve first!")
+            return False
 
-            if changed_files or untracked_files:
-                logger.info("Package not clean. Take action")
-                self.__commit_package(name, "{}: Update".format(name))
-                # stash
-                # commit
-                # drop
-                # stop action and quit
-
-            if not changed_files and not untracked_files:
-                break
-
-        # If package is now clean and commited
-        # `````````````````````````````````````````````````````
-        # 1. Create temporary directory $tempdir
-        # 2. git archive $TAG:$NAME | tar x -C $tempdir
-        # 3. rm -r $REPO/$NAME/*
-        # 4. cp -ar $tempdir/* $REPO/$NAME
-        # 5. delete $tempdir
-        # 6. git commit --allow-empty the package
-        # `````````````````````````````````````````````````````
-        with common.tempdir() as tdir:
+        with muninn.fs.tempdir() as tdir:
             # Restore the path at the given tag
-            tag = "{}/{}".format(name, desired_version)
-            common.restore_path_at_tag(self.repo, tag, name, tdir)
+            tag = "{}/{}/update".format(name, desired_version)
+            muninn.git.restore_path_at_tag(self.repo, tag, name, tdir)
 
             # Delete the current folder & and recreate since its easier...
             pkg_path = self.path.joinpath(name)
@@ -124,14 +113,27 @@ class Repository():
             # Copy the restored folder
             shutil.copytree(Path(tdir), pkg_path)
 
-            self.__commit_package(name, "{}: Rollback to {}".format(name, desired_version))
+            # And commit accordingly
+            self.__commit_package(name, "{}: Rollback to {}".format(name,
+                                                                    desired_version),
+                                  "rollback_from/{}".format(desired_version))
+
+        return True
 
     def current_package_revision(self, name):
-        return self.get_package_revisions(name)[-1]
+        tag = self.repo.git.describe("--match", "{}/*".format(name), "--tags", "HEAD")
+        tag = tag.split("/")
+        if tag[2] == "update":
+            return tag[1]
+        elif tag[2] == "rollback_from":
+            return tag[3]
+        else:
+            raise NotImplementedError
 
     def get_package_revisions(self, name):
         revisions = self.repo.git.tag('--list', "{}/*".format(name)).split('\n')
-        revisions = list({rev.split("/")[1] for rev in revisions})
+        revisions = [rev.split("/") for rev in revisions]
+        revisions = {rev[1] for rev in revisions if rev[2] == "update"}
         return sorted(revisions)
 
     def get_tracked_packages(self):
@@ -141,14 +143,14 @@ class Repository():
         return pkgs
 
     def list_untracked_packages(self):
-        # difference of subfolders and tracked packagers (sets)
+        # difference of sub-folders and tracked packagers (sets)
         tracked_pkgs = set(self.get_tracked_packages())
         pkgs = set(self.__search_package_candidates().keys())
         list(pkgs.difference(tracked_pkgs))
 
     def check_package_status(self, name=""):
-        changed_files = common.get_changed_files(self.repo)
-        untracked_files = common.get_untracked_files(self.repo)
+        changed_files = muninn.git.get_changed_files(self.repo)
+        untracked_files = muninn.git.get_untracked_files(self.repo)
 
         if name:
             changed_files = [(file, ctype) for file, ctype in changed_files if
@@ -158,17 +160,43 @@ class Repository():
 
         return changed_files, untracked_files
 
-    def __commit_package(self, pkg_name, message, file_selector=True):
-        files = common.git_file_choose_dialog(
-            *self.check_package_status(pkg_name)) if file_selector else [pkg_name]
+    def modified_packages(self):
+        # get all modified files
+        cf, _ = self.check_package_status()
+        pkgs = {file[0].split("/")[0] for file in cf}
+        return pkgs
+
+    def __commit_package(self, pkg_name, message, commit_type="update",
+                         file_selector=True):
+        files = muninn.git.git_file_choose_dialog(
+            *self.check_package_status(pkg_name)) if file_selector else [
+            pkg_name]
 
         files = [str(self.path.joinpath(file)) for file in files]
 
         if files:
-            common.stage_and_commit_files(self.repo, files, message)
-            self.repo.create_tag("{}/{}".format(pkg_name, common.timestamp()))
+            muninn.git.stage_and_commit_files(self.repo, files, message)
+            ts = common.timestamp()
+            self.repo.create_tag(
+                "{}/{}/{}".format(pkg_name, ts, commit_type))
+            return ts
         else:
             logger.debug("Nothing to commit, skipping.")
+
+    def __update_repo_files(self):
+        # like gitignore???
+        pass
+
+    def __copy_gitignore(self):
+        filep = os.path.join(common.muninn_module_path(), "templates",
+                             "repo_gitignore")
+        shutil.copyfile(filep, self.path.joinpath(".gitignore"))
+
+    def __copy_package_base(self, pkg_name):
+        filep = os.path.join(common.muninn_module_path(), "templates",
+                             "package_base")
+        shutil.copyfile(filep, self.path.joinpath("{}".format(pkg_name),
+                                                  "{}.py".format(pkg_name)))
 
     ############################################################################
     ################### DATABASE & REPOSITORY ##################################
@@ -192,88 +220,60 @@ class Repository():
 
         # Init the git repo (again if it already exists...doesnt hurt)
         try:
-            Repo(str(self.path))
+            self.repo = Repo(str(self.path))
             logger.debug(
                 "Repository already exists. Manually rebuild database if desired!")
             return True
         except InvalidGitRepositoryError:
-            repo = Repo.init(str(self.path))
+            self.repo = Repo.init(str(self.path))
 
         # Add and commit gitignore
         self.__copy_gitignore()
-        common.stage_and_commit_files(repo,
-                                      str(self.path.joinpath(".gitignore")),
+        muninn.git.stage_and_commit_files(self.repo,
+                                          str(self.path.joinpath(".gitignore")),
                                       ".gitignore base")
-        repo.create_tag("repo/initialization")
-
-        # Generate (new) database
-        self.__rebuild_database()
+        self.repo.create_tag("repo/initialization")
 
         self.initialized = True
         return True
 
-    def add_remote(self, url, name='origin'):
-        pass
-
     def list_remotes(self):
-        pass
+        return {remote.name for remote in repo.remotes}
 
-    def remove_remotes(self, name='origin'):
-        pass
+    def add_remote(self, remote, url):
+        if not remote in self.list_remotes():
+            return self.repo.create_remote(remote, url)
+        else:
+            raise exc.RepositoryRemoteAlreadyExists
 
-    def __update_repo_files(self):
-        # like gitignore???
-        pass
+    def delete_remote(self, remote):
+        if remote in self.list_remotes():
+            return self.repo.delete_remote(remote)
+        else:
+            raise exc.RepositoryRemoteDoesNotExists
 
-    def __rebuild_database(self):
-        logger.debug("Rebuilding database")
-        # Search for packages
-        pkg_candidates = self.__search_package_candidates()
+    def pull(self, remote='origin'):
+        # if remote in self.repo.remotes:
+        try:
+            self.repo.remotes[remote].pull()
+        except GitCommandError:
+            # call mergetool?
+            self.repo.git.mergetool()
+            if common.yes_or_no("Merge finished? Yes, will commit changes!"):
+                self.repo.git.reset()
+                dirty_pkgs = self.modified_packages()
+                for pkg in dirty_pkgs:
+                    self.__commit_package(pkg, "{}: Merge".format(pkg), "update/merge")
+        except IndexError:
+            logger.error("Remote {} does not exit.".format(remote))
+            raise exc.RepositoryRemoteDoesNotExists
 
-        # Load pkgs
-        pkgs = {name: packages.load_package(path, name) for (name, path) in
-                pkg_candidates.items()}
-
-        # Filter out invalid muninn pkgs
-        self.pkgs = {name: pkg for (name, pkg) in pkgs.items() if pkg().valid}
-        self.invalid_pkgs = {name: pkg for (name, pkg) in pkgs.items() if
-                             not pkg().valid}
-        logger.debug("Valid muninn pkgs found: {}".format(self.pkgs))
-
-        # TODO: Add and commit got git repo
-        # if self.db_path.is_file():
-        #     logger.debug("Existing database will be renamed to .db.json.bak (hidden file)")
-        #     self.db_path.rename(self.path.joinpath(".db.json.bak"))
-        #
-        # # Write new database
-        # self.__write_database()
-
-    def __search_package_candidates(self):
-        logger.debug(
-            "Scanning repository for packages in: '{}'".format(str(self.path)))
-
-        # Aggregate potential packages by finding all subdirectories in repository
-        pkg_candidates = common.get_immediate_subdirectories(self.path)
-        logger.debug("Package Candidates %s", pkg_candidates)
-
-        # Check if they contain a python file of same name
-        packages = {pkg_candidate: os.path.join(self.path, pkg_candidate) for
-                    pkg_candidate in pkg_candidates if os.path.exists(
-            os.path.join(self.path, pkg_candidate, pkg_candidate + ".py"))}
-
-        logger.info("Found %i packages: %s", len(packages), packages)
-        return packages
-
-    def __write_database(self):
-        pass
-
-    def __copy_gitignore(self):
-        filep = os.path.join(common.muninn_module_path(), "templates",
-                             "repo_gitignore")
-        shutil.copyfile(filep, self.path.joinpath(".gitignore"))
-
-    def __copy_package_base(self, pkg_name):
-        filep = os.path.join(common.muninn_module_path(), "templates",
-                             "package_base")
-        shutil.copyfile(filep, self.path.joinpath("{}".format(pkg_name),
-                                                  "{}.py".format(pkg_name)))
+    def push(self, remote='origin'):
+        try:
+            self.repo.remotes[remote].push()
+        except GitCommandError:
+            logger.error("Push rejected. Check if URL is accessible, or trying pulling first and resolve any merge conflicts.")
+            raise exc.RepositoryRemotePushConflict
+        except IndexError:
+            logger.error("Remote {} does not exit.".format(remote))
+            raise exc.RepositoryRemoteDoesNotExists
