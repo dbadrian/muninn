@@ -5,6 +5,7 @@ import os
 
 import muninn.common as common
 import muninn.package as packages
+import muninn.text
 
 common.setup_logging(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -48,10 +49,10 @@ def main():
 
     with open("templates/muninn_readme.tpl", 'r') as f_sample:
         readme_txt = f_sample.read()
-        readme_txt = common.replace_tags(readme_txt, "SUPPORTED_PACKAGES_PLACEHOLDER", pkg_table)
+        readme_txt = muninn.text.replace_tags(readme_txt, "SUPPORTED_PACKAGES_PLACEHOLDER", pkg_table)
 
     with open("muninn_conda_env", 'r') as f_sample:
-        readme_txt = common.replace_tags(readme_txt, "ANACONDA_REQUIREMENTS_FILE", f_sample.read())
+        readme_txt = muninn.text.replace_tags(readme_txt, "ANACONDA_REQUIREMENTS_FILE", f_sample.read())
 
     # Place a comment at the specified location to notify user
     comment = "*Attention: This README was automatically generated at {}.*".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
@@ -64,7 +65,7 @@ def main():
     with open("README.md", 'r') as f_sample:
         readme_txt = f_sample.read()
         sproc = common.run_linux_cmd("gh-md-toc README.md")
-        readme_txt = common.replace_tags(readme_txt, "TOC", sproc.stdout.decode(
+        readme_txt = muninn.text.replace_tags(readme_txt, "TOC", sproc.stdout.decode(
             "utf-8"))
 
     with open("README.md", 'w') as f_output:

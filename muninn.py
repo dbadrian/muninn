@@ -25,6 +25,9 @@ from itertools import groupby
 import muninn.common as common
 from muninn.package_manager import PackageManager
 
+import muninn.git
+import muninn.text
+
 common.setup_logging(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
@@ -179,11 +182,11 @@ class Muninn(object):
         pm = PackageManager(args.repository)
 
         # print summary of all modified files and changes according to current
-        changed = common.get_changed_files(args.repository)
+        changed = muninn.git.get_changed_files(args.repository)
         changed = [file for file in changed if len(file.split(os.sep)) > 1]
         changed_g = {k: list(g) for k, g in
                      groupby(changed, lambda s: s.split(os.sep)[0])}
-        untracked = common.get_untracked_files(args.repository)
+        untracked = muninn.git.get_untracked_files(args.repository)
         untracked_g = {k: list(g) for k, g in
                        groupby(untracked, lambda s: s.split(os.sep)[0])}
 
@@ -226,7 +229,7 @@ class Muninn(object):
             msg += pkg_msg.format(pkg, s_changed, s_untracked)
 
         ret = common.message_from_sys_editor(msg)
-        files_to_stage = common.get_non_comment_lines(ret)
+        files_to_stage = muninn.text.get_non_comment_lines(ret)
 
         print("\nFollowing files have been selected for staging:\n")
         for file in files_to_stage:
@@ -254,9 +257,9 @@ class Muninn(object):
         pkg_table = common.generate_supported_pkgs_string(pm.pkgs)
         with open("templates/repository_readme.tpl", 'r') as f_sample:
             readme_txt = f_sample.read()
-            readme_txt = common.replace_tags(readme_txt,
+            readme_txt = muninn.text.replace_tags(readme_txt,
                                              "SUPPORTED_PACKAGES_PLACEHOLDER",
-                                             pkg_table)
+                                                  pkg_table)
 
         # Place a comment at the specified location to notify user
         comment = "*Attention: This README was automatically generated at {}.*".format(
@@ -281,10 +284,10 @@ class Muninn(object):
 
             msg = common.message_from_sys_editor(msg)
 
-        common.commit(args.repository, message=msg)
+        muninn.git.commit(args.repository, message=msg)
 
         print("\n... Pushing new commit to remote repository.")
-        common.push(args.repository)
+        muninn.git.push(args.repository)
 
     def __list(self, args):
         raise NotImplementedError

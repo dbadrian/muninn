@@ -28,11 +28,19 @@ logger = logging.getLogger(__name__)
 
 def main():
     rp = repo.Repository("/tmp/muninn_repo")
-    # rp.initialize_repository()
-    # rp.add_empty_package("zsh")
-    # rp.start_tracking_package("zsh")
-    # rp.update_package("zsh")
+    rp.initialize_repository()
 
+    # rp.add_empty_package("zsh")
+    # ts0 = rp.start_tracking_package("zsh")
+    #
+    # open("/tmp/muninn_repo/zsh/a", "a").close()
+    # ts1 = rp.update_package("zsh")
+    #
+    # open("/tmp/muninn_repo/zsh/b", "a").close()
+    # ts2 = rp.update_package("zsh")
+    #
+    #
+    #
     # print(rp.get_package_revisions("zsh"))
     # print(rp.current_package_revision("zsh"))
 
@@ -41,7 +49,12 @@ def main():
     # print(common.git_file_choose_dialog(*rp.check_package_status("zsh")))
     # rp.start_tracking_package("zsh")
     # rp.update_package("zsh")
-    rp.rollback_package("zsh", "180817-230529")
+    # rp.rollback_package("zsh", ts0)
+    # print(rp.current_package_revision("zsh"))
+
+    rp.pull("origin")
+    # ts2 = rp.update_package("zsh")
+    # print(rp.modified_packages())
 
 if __name__ == '__main__':
     main()
